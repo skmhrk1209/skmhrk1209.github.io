@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>🍤</title>
-    <link>https://skmhrk1209.github.io/</link>
-    <description>Recent content on 🍤</description>
+    <title>python on 🍤</title>
+    <link>https://skmhrk1209.github.io/tags/python/</link>
+    <description>Recent content in python on 🍤</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 11 Aug 2020 23:24:00 +0900</lastBuildDate>
     
-	<atom:link href="https://skmhrk1209.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://skmhrk1209.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,15 +18,6 @@
       
       <guid>https://skmhrk1209.github.io/posts/max/msp-python/</guid>
       <description>Max/MSPでは従来のグラフィカルなプログラミング以外にもGenやJavaScriptなどのテキストベースのプログラミングもサポートされている． CやJavaでexternalを開発することもできるが</description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>https://skmhrk1209.github.io/about/</link>
-      <pubDate>Tue, 11 Aug 2020 22:53:00 +0900</pubDate>
-      
-      <guid>https://skmhrk1209.github.io/about/</guid>
-      <description>¯_(ツ)_/¯</description>
     </item>
     
   </channel>

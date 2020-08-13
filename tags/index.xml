@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on My New Hugo Site</title>
+    <title>Tags on 🍤</title>
     <link>https://skmhrk1209.github.io/tags/</link>
-    <description>Recent content in Tags on My New Hugo Site</description>
+    <description>Recent content in Tags on 🍤</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
+    <language>ja</language>
+    <lastBuildDate>Tue, 11 Aug 2020 23:24:00 +0900</lastBuildDate>
     
 	<atom:link href="https://skmhrk1209.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>c&#43;&#43;</title>
+      <link>https://skmhrk1209.github.io/tags/c&#43;&#43;/</link>
+      <pubDate>Tue, 11 Aug 2020 23:24:00 +0900</pubDate>
+      
+      <guid>https://skmhrk1209.github.io/tags/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>https://skmhrk1209.github.io/tags/python/</link>
+      <pubDate>Tue, 11 Aug 2020 23:24:00 +0900</pubDate>
+      
+      <guid>https://skmhrk1209.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Max/MSP</title>
+      <link>https://skmhrk1209.github.io/tags/max/msp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://skmhrk1209.github.io/tags/max/msp/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>
