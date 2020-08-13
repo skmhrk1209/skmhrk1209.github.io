@@ -12,10 +12,10 @@
     
     <item>
       <title>Max/MSPでPythonを使う</title>
-      <link>https://skmhrk1209.github.io/posts/max/msp-python/</link>
+      <link>https://skmhrk1209.github.io/posts/max-msp-python/</link>
       <pubDate>Tue, 11 Aug 2020 23:24:00 +0900</pubDate>
       
-      <guid>https://skmhrk1209.github.io/posts/max/msp-python/</guid>
+      <guid>https://skmhrk1209.github.io/posts/max-msp-python/</guid>
       <description>Max/MSPでは従来のグラフィカルなプログラミング以外にもGenやJavaScriptなどのテキストベースのプログラミングもサポートされている． CやJavaでexternalを開発することもできるが</description>
     </item>
     
