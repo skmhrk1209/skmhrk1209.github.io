@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Hiroki Sakuma" />
+	
+	
+	
+	<title>Environment Mapping ｜ 🍤</title>
+	
+    
+    
+    <meta name="description" content="前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した． 今回は環境マッピングの原理を理解し，GLSLコードに落とし込み" />
+    
+
+    
+    
+    <meta name="keywords" content="Max/MSP, Ableton Live, PyTorch, TensorFlow" />
+    
+
+	
+    
+    <link rel="shortcut icon" href="https://skmhrk1209.github.io/images/favicon.ico" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="https://skmhrk1209.github.io/css/normalize.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="https://skmhrk1209.github.io/css/zozo.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="https://skmhrk1209.github.io/css/highlight.css" />
+
+    
+    
+</head>
+
+<body>
+    <div class="main animate__animated animate__fadeInDown">
+        <div class="nav_container animated fadeInDown">
+    <div class="site_nav" id="site_nav">
+        <ul>
+            
+            <li>
+                <a href="/">Home</a>
+            </li>
+            
+            <li>
+                <a href="/posts/">Archive</a>
+            </li>
+            
+            <li>
+                <a href="/tags/">Tags</a>
+            </li>
+            
+            <li>
+                <a href="/about/">About</a>
+            </li>
+            
+        </ul>
+    </div>
+    <div class="menu_icon">
+        <a id="menu_icon"><i class="ri-menu-line"></i></a>
+    </div>
+</div>
+        <div class="header animated fadeInDown">
+    <div class="site_title_container">
+        <div class="site_title">
+            <h1>
+                <a href="https://skmhrk1209.github.io/">
+                    <span>🍤</span>
+                </a>
+            </h1>
+        </div>
+        <div class="description">
+            <p class="sub_title">Hiroki Sakuma</p>
+            <div class="my_socials">
+                
+                
+                
+                
+                <a href="https://github.com/skmhrk1209" title="github" target="_blank"><i class="ri-github-fill"></i></a>
+                
+                
+                
+                
+                
+                
+                
+                
+                <a href="https://skmhrk1209.github.io/index.xml" type="application/rss+xml" title="rss" target="_blank"><i
+                        class="ri-rss-fill"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="content">
+            <div class="post_page">
+                <div class="post animate__animated animate__fadeInDown">
+                    <div class="post_title post_detail_title">
+                        <h2><a href='/posts/environment-mapping/'>Environment Mapping</a></h2>
+                        <span class="date">2020.10.05</span>
+                    </div>
+                    <div class="post_content markdown"><p>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した．
+今回は環境マッピングの原理を理解し，GLSLコードに落とし込み，実際にレンダリングすることを目標にする．
+環境マッピング自体は有名な手法で，周囲の環境を金属やガラスのように映し出すオブジェクトをレンダリングできる．
+あくまで擬似的な映り込みであるが，レイトレーシングみたいな計算量は必要ない．
+以下は今回使用した<a href="https://libcinder.org/">Cinder</a>というライブラリに入っている環境マッピングのサンプルである．
+まぁこんな感じのことをやりたいわけである．
+ちなみにCinderはOpenGLをモダンに抽象化したようなC++ライブラリである．似たようなものに<a href="https://openframeworks.cc/">openFrameWorks</a>があるが，Cinderの方がよりOpenGL内部に踏み込まないといけない．C++自体もCinderの方が今っぽい書き方ができる．</p>
+<div align="center">
+<img src="screenshot_cinder.png" width="800">
+</div>
+<br>
+<p>今回は環境マッピングのうちキューブマッピングというものを勉強した．
+他にもスフィアマップなるものもあるみたいだが，本質は変わらなそうなので，今回はスキップする．
+キューブマッピングの原理は単純で， 以下のような6面のテクスチャからなる十分に大きいキューブで世界を包むことである．</p>
+<div align="center">
+<img src="cube_map_cinder.jpg" width="600">
+</div>
+<br>
+<p>オブジェクトにレイを飛ばし，反射光がキューブに当たったらそこをサンプリングする．
+ここでキューブは十分に大きいので，全てのオブジェクトはキューブの中心にあるとして良い．
+この場合，オブジェクトの位置によらず，反射光の方向のみによってサンプリングされるテクスチャが決定する（鏡面反射）．</p>
+<div align="center">
+<img src="cube_mapping.svg" width="400">
+</div>
+<br>
+<p>GLSLにはこのような反射方向からキューブマップテクスチャをサンプリングするための<code>samplerCube</code>なる型が存在する．
+よってバーテックスシェーダとフラグメントシェーダは以下のように書ける．</p>
+<p>cube_map.vert</p>
+<div class="highlight"><pre class="chroma"><code class="language-cpp:cube_map_vert.cpp" data-lang="cpp:cube_map_vert.cpp"><span class="cp">#version 150
+</span><span class="cp"></span>
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciModel</span><span class="p">;</span>
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciModelView</span><span class="p">;</span>
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciModelViewProjection</span><span class="p">;</span>
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciViewMatrix</span><span class="p">;</span>
+<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciViewMatrixInverse</span><span class="p">;</span>
+<span class="n">uniform</span> <span class="n">mat3</span> <span class="n">ciNormalMatrix</span><span class="p">;</span> <span class="c1">// = transpose(inverse(mat3(ciModelView)))
+</span><span class="c1"></span>
+<span class="n">in</span> <span class="n">vec4</span>	<span class="n">ciPosition</span><span class="p">;</span>
+<span class="n">in</span> <span class="n">vec3</span>	<span class="n">ciNormal</span><span class="p">;</span>
+
+<span class="n">out</span> <span class="n">highp</span> <span class="n">vec3</span> <span class="n">eyeDirectionWorld</span><span class="p">;</span>
+<span class="n">out</span> <span class="n">highp</span> <span class="n">vec3</span> <span class="n">normalWorld</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">ciModelViewProjection</span> <span class="o">*</span> <span class="n">ciPosition</span><span class="p">;</span>
+    
+    <span class="n">vec4</span> <span class="n">positionView</span> <span class="o">=</span> <span class="n">ciModelView</span> <span class="o">*</span> <span class="n">ciPosition</span><span class="p">;</span>
+    <span class="n">vec4</span> <span class="n">eyeDirectionView</span> <span class="o">=</span> <span class="n">positionView</span> <span class="o">-</span> <span class="n">vec4</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// eye is always at 0,0,0 in view space
+</span><span class="c1"></span>    <span class="n">eyeDirectionWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">ciViewMatrixInverse</span> <span class="o">*</span> <span class="n">eyeDirectionView</span><span class="p">));</span>
+    
+    <span class="n">vec3</span> <span class="n">normalView</span> <span class="o">=</span> <span class="n">ciNormalMatrix</span> <span class="o">*</span> <span class="n">ciNormal</span><span class="p">;</span>
+    <span class="n">normalWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">vec4</span><span class="p">(</span><span class="n">normalView</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">ciViewMatrix</span><span class="p">));</span>
+    <span class="c1">// normalWorld = normalize(transpose(inverse(mat3(ciModel))) * ciNormal);
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>cube_map.flag</p>
+<div class="highlight"><pre class="chroma"><code class="language-cpp:cube_map_flag.cpp" data-lang="cpp:cube_map_flag.cpp"><span class="cp">#version 150
+</span><span class="cp"></span>
+<span class="n">uniform</span> <span class="n">samplerCube</span> <span class="n">samplerCubeMap</span><span class="p">;</span>
+<span class="n">in</span> <span class="n">vec3</span> <span class="n">eyeDirectionWorld</span><span class="p">;</span>
+<span class="n">in</span> <span class="n">vec3</span> <span class="n">normalWorld</span><span class="p">;</span>
+<span class="n">out</span> <span class="n">vec4</span> <span class="n">flagColor</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">vec3</span> <span class="n">reflectionDirection</span> <span class="o">=</span> <span class="n">reflect</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">);</span>
+    <span class="n">flagColor</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">samplerCubeMap</span><span class="p">,</span> <span class="n">reflectionDirection</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><p>ここでフラグメントシェーダはバーテックスシェーダから渡された視線方向と法線から，ビルトイン関数<code>reflect</code>によって，反射方向を計算し，キューブマップテクスチャをサンプリングしている．
+問題はバーテックスシェーダである．
+GLSLに慣れていないので，法線の世界座標をどうやって取っているのか，Cinderのサンプルを見てみたら以下のように書いてあった．</p>
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">vec3</span> <span class="n">normalView</span> <span class="o">=</span> <span class="n">ciNormalMatrix</span> <span class="o">*</span> <span class="n">ciNormal</span><span class="p">;</span>
+<span class="n">normalWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">vec4</span><span class="p">(</span><span class="n">normalView</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">ciViewMatrix</span><span class="p">));</span>
+</code></pre></div><p>まず，ビュー座標系に変換するのに，<code>ciNormalMatrix</code>なるuniform型変数が使われている．
+そもそもこの<code>ciNormalMatrix</code>の意味がわからなかった．<code>ciModelView</code>じゃダメなのかと．
+調べてみると頂点に対する変換では法線としての性質は保たれないらしい．</p>
+<p>そこで頂点$p$がある変換行列Tによって$p'$に移るとき，$p$における法線$n$を$p'$における法線$n'$に移すような変換行列$U$は何かを考える．
+$Tm=T(q-p)=Tq-Tp=q&rsquo;-p'=m'$より$T$は$p$における接線$m$を$p'$における接線$m'$に移す．
+変換後の接線と法線は互いに垂直となることから，$m'^{T}n'=(Tm)^{T}(Un)=m^{T}T^{T}Un=0$が成り立てば良い．
+$T^{T}U=E$のとき$m'^{T}n'=m^{T}n=0$となるので，$U=(T^{T})^{-1}=(T^{-1})^{T}$は法線$n$を法線$n'$に移す変換の1つである．</p>
+<p>ということで<code>ciNormalMatrix</code>の実態は<code>transpose(inverse(mat3(ciModelView)))</code>らしい．
+ここまでで<code>vec3 normalView = ciNormalMatrix * ciNormal;</code>の意味はわかった．</p>
+<p><code>normalWorld = normalize(vec3(vec4(normalView, 0) * ciViewMatrix));</code>の意味はなんだろう．
+頂点を世界座標系からビュー座標系に移すのが<code>ciViewMatrix</code>なので，法線を世界座標系からビュー座標系に移すのは<code>transpose(inverse(mat3(ciViewMatrix)))</code>である．
+今ビュー座標系における法線<code>normalView</code>が手に入っているので，世界座標系に戻すためにさらに<code>inverse</code>したものを左からかけて，</p>
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">inverse</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">inverse</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">ciViewMatrix</span><span class="p">))))</span> <span class="o">*</span> <span class="n">normalView</span> 
+<span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">ciViewMatrix</span><span class="p">))</span> <span class="o">*</span> <span class="n">normalView</span> 
+<span class="o">=</span> <span class="n">normalView</span> <span class="o">*</span> <span class="n">mat3</span><span class="p">(</span><span class="n">ciViewMatrix</span><span class="p">)</span>
+</code></pre></div><p>としているんだと思う．
+これは1つのやり方で，他にも<code>normalWorld = normalize(transpose(inverse(mat3(ciModel))) * ciNormal);</code>とかでもいいと思う．</p>
+<p>今回キューブマップ用のテクスチャとして以下のような画像を用意した．</p>
+<div align="center">
+<img src="cube_map.png" width="600">
+</div>
+<br>
+<p>これで周囲の環境を完全鏡面反射するオブジェクトは以下のようにレンダリングできる．</p>
+<div align="center">
+<img src="screenshot_object.png" width="800">
+</div>
+<br>
+<p>次に肝心の環境そのものをレンダリングしなくてはならない．
+これはもっと単純でオブジェクトの頂点方向をサンプリングすれば良い．</p>
+<div align="center">
+<img src="sky_box.svg" width="400">
+</div>
+<br>
+<p>これで以下のようにレンダリングできる．</p>
+<div align="center">
+<img src="screenshot_cube_mapping.png" width="800">
+</div>
+<br>
+<p>最後に，今までは反射光のみをレンダリングしてきた．これをそれに加えて屈折光もレンダリングすることを考える．
+ただし簡単のため，2度目以降の屈折は考えない．
+屈折光はGLSLのビルトイン関数<code>refract</code>で計算できる．<code>reflect</code>との違いは屈折率の比を与えてやるということである．
+また反射光と屈折光の割合は<a href="https://en.wikipedia.org/wiki/Fresnel_equations">フレネル反射率</a>で計算できる．
+今回は大気の屈折率$n_{1} \fallingdotseq 1.0$，ガラスの屈折率$n_{2} \fallingdotseq 1.5$を用い，<a href="https://en.wikipedia.org/wiki/Schlick%27s_approximation">Schlickの近似式</a>により計算した．</p>
+<p>フラグメントシェーダは以下のようになる．</p>
+<div class="highlight"><pre class="chroma"><code class="language-cpp:cube_mapping_frag.cpp" data-lang="cpp:cube_mapping_frag.cpp"><span class="cp">#version 150
+</span><span class="cp"></span>
+<span class="n">uniform</span> <span class="n">samplerCube</span> <span class="n">samplerCubeMap</span><span class="p">;</span>
+<span class="n">in</span> <span class="n">vec3</span> <span class="n">eyeDirectionWorld</span><span class="p">;</span>
+<span class="n">in</span> <span class="n">vec3</span>    <span class="n">normalWorld</span><span class="p">;</span>
+<span class="n">out</span> <span class="n">vec4</span> <span class="n">flagColor</span><span class="p">;</span>
+
+<span class="n">uniform</span> <span class="kt">float</span> <span class="n">refractiveIndex</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">1.5</span><span class="p">;</span>
+
+<span class="kt">float</span> <span class="nf">fresnelReflectance</span><span class="p">(</span><span class="n">vec3</span> <span class="n">light</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">normal</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">float</span> <span class="n">specularReflectance</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">refractiveIndex</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">refractiveIndex</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">specularReflectance</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">specularReflectance</span><span class="p">)</span> <span class="o">*</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">light</span><span class="p">,</span> <span class="n">normal</span><span class="p">),</span> <span class="mf">5.0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// refract the eye ray upong entering the surface (we&#39;re ignoring the second refraction when the ray exits the object).
+</span><span class="c1"></span>    <span class="n">vec3</span> <span class="n">refractionDirection</span> <span class="o">=</span> <span class="n">refract</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">,</span> <span class="n">refractiveIndex</span><span class="p">);</span>
+    <span class="c1">// reflect the eye ray about the surface normal (all in world space)
+</span><span class="c1"></span>    <span class="n">vec3</span> <span class="n">reflectionDirection</span> <span class="o">=</span> <span class="n">reflect</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">);</span>
+
+    <span class="n">vec4</span> <span class="n">flagColorRefracted</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">samplerCubeMap</span><span class="p">,</span> <span class="n">refractionDirection</span><span class="p">);</span>
+    <span class="n">vec4</span> <span class="n">flagColorReflected</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">samplerCubeMap</span><span class="p">,</span> <span class="n">reflectionDirection</span><span class="p">);</span>
+    
+    <span class="n">flagColor</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">flagColorRefracted</span><span class="p">,</span> <span class="n">flagColorReflected</span><span class="p">,</span> <span class="n">fresnelReflectance</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div><p>屈折を考慮することで，背景がガラスのように透けて見えるようになった．</p>
+<div align="center">
+<img src="screenshot_reflection.png" width="800">
+<span>Reflection mapping</span>
+<img src="screenshot_reflaction.png" width="800">
+<span>Refraction mapping</span>
+</div>
+<br>
+<p>今後もいろいろなレンダリング手法を少しずつGLSLを通して勉強していきたい．</p>
+</div>
+                    <div class="post_footer">
+                        
+                        <div class="meta">
+                            <div class="info">
+                                <span class="field tags">
+                                    <i class="ri-stack-line"></i>
+                                    
+                                    <a href="https://skmhrk1209.github.io/tags/computer-graphics/">computer graphics</a>
+                                    
+                                    <a href="https://skmhrk1209.github.io/tags/environment-mapping/">environment mapping</a>
+                                    
+                                    <a href="https://skmhrk1209.github.io/tags/cinder/">cinder</a>
+                                    
+                                </span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                
+                <div class="doc_comments"></div>
+                
+            </div>
+        </div>
+    </div>
+    <a id="back_to_top" href="#" class="back_to_top"><i class="ri-arrow-up-s-line"></i></a>
+    <footer class="footer">
+    <div class="powered_by">
+        <a href="https://varkai.com">Designed by VarKai,</a>
+        <a href="http://www.gohugo.io/">Proudly published with Hugo</a>
+    </div>
+
+    <div class="footer_slogan">
+        <span>¯\_(ツ)_/¯</span>
+    </div>
+</footer>
+    <script src="https://skmhrk1209.github.io/js/jquery-3.5.1.min.js"></script>
+<link href="https://skmhrk1209.github.io/css/fancybox.min.css" rel="stylesheet">
+<script src="https://skmhrk1209.github.io/js/fancybox.min.js"></script>
+<script src="https://skmhrk1209.github.io/js/zozo.js"></script>
+
+
+<script type="text/javascript" async
+    src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\[\[', '\]\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                TeX: {
+                    equationNumbers: { autoNumber: "AMS" },
+                    extensions: ["AMSmath.js", "AMSsymbols.js"]
+                }
+            }
+        });
+
+        MathJax.Hub.Queue(function () {
+            
+            
+            
+            var all = MathJax.Hub.getAllJax(), i;
+            for (i = 0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+            }
+        });
+    </script>
+
+<style>
+    code.has-jax {
+        font: inherit;
+        font-size: 100%;
+        background: inherit;
+        border: inherit;
+        color: #515151;
+    }
+</style>
+
+
+
+</body>
+
+</html>
