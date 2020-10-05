@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>glsl on 🍤</title>
+    <link>https://skmhrk1209.github.io/tags/glsl/</link>
+    <description>Recent content in glsl on 🍤</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Mon, 05 Oct 2020 03:29:07 +0900</lastBuildDate>
+    
+	<atom:link href="https://skmhrk1209.github.io/tags/glsl/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Environment Mapping</title>
+      <link>https://skmhrk1209.github.io/posts/environment-mapping/</link>
+      <pubDate>Mon, 05 Oct 2020 03:29:07 +0900</pubDate>
+      
+      <guid>https://skmhrk1209.github.io/posts/environment-mapping/</guid>
+      <description>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した． 今回は環境マッピングの原理を理解し，GLSLコードに落とし込み</description>
+    </item>
+    
+  </channel>
+</rss>
