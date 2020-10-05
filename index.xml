@@ -2,48 +2,48 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>🍤</title>
-    <link>https://skmhrk1209.github.io/</link>
+    <link>https://hirokisakuma.com/</link>
     <description>Recent content on 🍤</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 05 Oct 2020 03:29:07 +0900</lastBuildDate>
     
-	<atom:link href="https://skmhrk1209.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://hirokisakuma.com/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Environment Mapping</title>
-      <link>https://skmhrk1209.github.io/posts/environment-mapping/</link>
+      <link>https://hirokisakuma.com/posts/environment-mapping/</link>
       <pubDate>Mon, 05 Oct 2020 03:29:07 +0900</pubDate>
       
-      <guid>https://skmhrk1209.github.io/posts/environment-mapping/</guid>
+      <guid>https://hirokisakuma.com/posts/environment-mapping/</guid>
       <description>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した． 今回は環境マッピングの原理を理解し，GLSLコードに落とし込み</description>
     </item>
     
     <item>
       <title>最近聴いている音楽</title>
-      <link>https://skmhrk1209.github.io/posts/music/</link>
+      <link>https://hirokisakuma.com/posts/music/</link>
       <pubDate>Thu, 01 Oct 2020 23:56:15 +0900</pubDate>
       
-      <guid>https://skmhrk1209.github.io/posts/music/</guid>
+      <guid>https://hirokisakuma.com/posts/music/</guid>
       <description>最近好みの音楽が立て続けにリリースされたので，ちょっとまとめてみようと思う． 基本的にはいわゆるエレクトロニックミュージックを中心に聴いている． 1. Avalon Emerson - DJ-Kicks このDJ-KicksというミックスシリーズはBu</description>
     </item>
     
     <item>
       <title>Max/MSPでPythonを使う</title>
-      <link>https://skmhrk1209.github.io/posts/max-msp-python/</link>
+      <link>https://hirokisakuma.com/posts/max-msp-python/</link>
       <pubDate>Tue, 11 Aug 2020 23:24:00 +0900</pubDate>
       
-      <guid>https://skmhrk1209.github.io/posts/max-msp-python/</guid>
+      <guid>https://hirokisakuma.com/posts/max-msp-python/</guid>
       <description>Max/MSPでは従来のグラフィカルなプログラミング以外にもGenやJavaScriptなどのテキストベースのプログラミングもサポートされている． CやJavaでexternalを開発することもできるが</description>
     </item>
     
     <item>
       <title>About</title>
-      <link>https://skmhrk1209.github.io/about/</link>
+      <link>https://hirokisakuma.com/about/</link>
       <pubDate>Tue, 11 Aug 2020 22:53:00 +0900</pubDate>
       
-      <guid>https://skmhrk1209.github.io/about/</guid>
+      <guid>https://hirokisakuma.com/about/</guid>
       <description>¯_(ツ)_/¯</description>
     </item>
     
