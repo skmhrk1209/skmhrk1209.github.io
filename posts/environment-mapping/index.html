@@ -174,8 +174,7 @@ GLSLに慣れていないので，法線の世界座標をどうやって取っ�
 <div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">vec3</span> <span class="n">normalView</span> <span class="o">=</span> <span class="n">ciNormalMatrix</span> <span class="o">*</span> <span class="n">ciNormal</span><span class="p">;</span>
 <span class="n">normalWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">vec4</span><span class="p">(</span><span class="n">normalView</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">ciViewMatrix</span><span class="p">));</span>
 </code></pre></div><p>まず，ビュー座標系に変換するのに，<code>ciNormalMatrix</code>なるuniform型変数が使われている．
-そもそもこの<code>ciNormalMatrix</code>の意味がわからなかった．<code>ciModelView</code>じゃダメなのかと．
-調べてみると頂点に対する変換では法線としての性質は保たれないらしい．</p>
+そもそもこの<code>ciNormalMatrix</code>の意味がわからなかった．<code>ciModelView</code>じゃダメなのかと．</p>
 <p>そこで頂点$p$がある変換行列$T$によって$p'$に移るとき，$p$における法線$n$を$p'$における法線$n'$に移すような変換行列$U$は何かを考える．
 $Tm=T(q-p)=Tq-Tp=q&rsquo;-p'=m'$より$T$は$p$における接線$m$を$p'$における接線$m'$に移す．
 変換後の接線と法線は互いに垂直となることから，$m'^{T}n'=(Tm)^{T}(Un)=m^{T}T^{T}Un=0$が成り立てば良い．
