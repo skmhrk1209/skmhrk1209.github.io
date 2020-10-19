@@ -129,7 +129,7 @@ $$\cfrac{\partial{\mathcal{L}}}{\partial{\theta}}=\sum_{u}\cfrac{\partial{\mathc
 <p><span>DVR [Niemeyer et al., CVPR'20]</span></p>
 </div>
 <br>
-<p>ここで$f_{\theta}$を用いてレイキャスティングした結果の交点を$\hat{p}$とすると，テクスチャサンプリングによって$\hat{I}_{u}=t_{\theta}(\hat{p})$と表せるので，
+<p>ここで$f_{\theta}$を用いてレイキャスティングした結果の交点を$\hat{p}$とすると，$\hat{I}_{u}=t_{\theta}(\hat{p})$であるから，
 $$\cfrac{\partial{\hat{I}_{u}}}{\partial{\theta}}=\cfrac{\partial{t_{\theta}(\hat{p})}}{\partial{\theta}}+\cfrac{\partial{t_{\theta}(\hat{p})}}{\partial{\hat{p}}}\cdot\cfrac{\partial{\hat{p}}}{\partial{\theta}}$$</p>
 <p>ここで$\cfrac{\partial{\hat{p}}}{\partial{\theta}}$は陽には計算できないが，$f_{\theta}(\hat{p})=0$の陰関数微分により，
 $$\cfrac{\partial{f_{\theta}(\hat{p})}}{\partial{\theta}}+\cfrac{\partial{f_{\theta}(\hat{p})}}{\partial{\hat{p}}}\cdot\cfrac{\partial{\hat{p}}}{\partial{\theta}}=0$$</p>
