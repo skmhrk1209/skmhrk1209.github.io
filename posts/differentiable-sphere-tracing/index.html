@@ -273,7 +273,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
 </div>
 <br>
 <p>結構不安だが，一応単位球面はレンダリングできていそうなので，これを自動微分の枠組みに組み込む．
-基本的には上記の<code>sphere_tracing(...)</code>を<code>torch.autograd.Function.forward</code>に移植し，
+基本的には上記の<code>sphere_tracing(...)</code>を<code>torch.autograd.Function.forward(...)</code>に移植し，
 <code>torch.autograd.Function.backward(...)</code>を陰関数微分にしたがって実装すれば良さそうである．</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">SphereTracing</span><span class="p">(</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
 
