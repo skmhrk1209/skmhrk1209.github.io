@@ -142,8 +142,7 @@ $$\cfrac{\partial{\hat{p}}}{\partial{\theta}}=-(\cfrac{\partial{f_{\theta}(\hat{
 例えばDVR [1] ではレイ上の点をサンプリングして，Occupancy Networkの出力が初めて0.5を跨いだ点（Occupancy Networkは与えられた点が3Dオブジェクト内部に存在する確率を出力するので，出力が0.5となる点はオブジェクト表面に存在すると推定されたことになる）を交点$\hat{p}$としている．</p>
 <p>他にもDIST [2], SDFDiff [3] ではスフィアトレーシングを用いてレンダリングしており，微分可能な形で交点$\hat{p}$を求める工夫をしている．</p>
 <div align="center">
-<img src="sphere_tracing.png" width="430">
-<img src="algorithm.png" width="370">
+<img src="sphere_tracing.png" width="430"><img src="algorithm.png" width="370">
 <p><span>DIST [Liu et al., CVPR'20]</span></p>
 </div>
 <br>
@@ -181,8 +180,7 @@ Supervision&quot;を扱う．</p>
 このShapeNetCore，3Dモデルが汚いためか，普通にフォンシェーディングすると，めちゃくちゃなシェーディングになった．
 なので，GTのレンダリングにはとりあえずフラットシェーディングを用いている．</p>
 <div align="center">
-<img src="car.png" width="390">
-<img src="motorbike.png" width="390">
+<img src="car.png" width="400"><img src="motorbike.png" width="400">
 <p><span>ShapeNetCore</span></p>
 </div>
 <br>
