@@ -107,6 +107,7 @@
 以下は今回使用した<a href="https://libcinder.org/">Cinder</a>というライブラリに入っている環境マッピングのサンプルである．
 まぁこんな感じのことをやりたいわけである．
 ちなみにCinderはOpenGLをモダンに抽象化したようなC++ライブラリである．似たようなものに<a href="https://openframeworks.cc/">openFrameworks</a>があるが，Cinderの方がよりOpenGL内部に踏み込まないといけない．C++自体もCinderの方が今っぽい書き方ができる．</p>
+<br>
 <div align="center">
 <img src="screenshot_cinder.png" width="800">
 </div>
@@ -114,6 +115,7 @@
 <p>今回は環境マッピングのうちキューブマッピングというものを勉強した．
 他にもスフィアマップなるものもあるみたいだが，本質は変わらなそうなので，今回はスキップする．
 キューブマッピングの原理は単純で， 以下のような6面のテクスチャからなる十分に大きいキューブで世界を包むことである．</p>
+<br>
 <div align="center">
 <img src="cube_map_cinder.jpg" width="600">
 </div>
@@ -121,6 +123,7 @@
 <p>オブジェクトにレイを飛ばし，反射光がキューブに当たったらそこをサンプリングする．
 ここでキューブは十分に大きいので，全てのオブジェクトはキューブの中心にあるとして良い．
 この場合，オブジェクトの位置によらず，反射光の方向のみによってサンプリングされるテクスチャが決定する（鏡面反射）．</p>
+<br>
 <div align="center">
 <img src="cube_mapping.svg" width="400">
 </div>
@@ -194,22 +197,26 @@ $T^{T}U=E$のとき$m'^{T}n'=m^{T}n=0$となるので，$U=(T^{T})^{-1}=(T^{-1})
 </code></pre></div><p>としているんだと思う．
 これは1つのやり方で，他にも<code>normalWorld = normalize(transpose(inverse(mat3(ciModel))) * ciNormal);</code>とかでもいいと思う．</p>
 <p>今回キューブマップ用のテクスチャとして以下のような画像を用意した．</p>
+<br>
 <div align="center">
 <img src="cube_map.png" width="600">
 </div>
 <br>
 <p>これで周囲の環境を完全鏡面反射するオブジェクトは以下のようにレンダリングできる．</p>
+<br>
 <div align="center">
 <img src="screenshot_object.png" width="800">
 </div>
 <br>
 <p>次に肝心の環境そのものをレンダリングしなくてはならない．
 これはもっと単純でオブジェクトの頂点方向をサンプリングすれば良い．</p>
+<br>
 <div align="center">
 <img src="sky_box.svg" width="400">
 </div>
 <br>
 <p>これで以下のようにレンダリングできる．</p>
+<br>
 <div align="center">
 <img src="screenshot_cube_mapping.png" width="800">
 </div>
@@ -248,6 +255,7 @@ $T^{T}U=E$のとき$m'^{T}n'=m^{T}n=0$となるので，$U=(T^{T})^{-1}=(T^{-1})
     <span class="n">flagColor</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">flagColorRefracted</span><span class="p">,</span> <span class="n">flagColorReflected</span><span class="p">,</span> <span class="n">fresnelReflectance</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">));</span>
 <span class="p">}</span>
 </code></pre></div><p>屈折を考慮することで，背景がガラスのように透けて見えるようになった．</p>
+<br>
 <div align="center">
 <img src="screenshot_reflection.png" width="800">
 <p><span>Reflection mapping</span></p>
