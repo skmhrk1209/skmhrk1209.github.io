@@ -3,12 +3,47 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://hirokisakuma.com/tags/cinder/</loc>
-    <lastmod>2020-10-05T03:29:07+09:00</lastmod>
+    <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
+    <loc>https://hirokisakuma.com/tags/differentiable-renderirng/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/posts/differentiable-sphere-tracing/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/neural-network/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/posts/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/sphere-tracing/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/cinder/</loc>
     <lastmod>2020-10-05T03:29:07+09:00</lastmod>
   </url>
   
@@ -19,21 +54,6 @@
   
   <url>
     <loc>https://hirokisakuma.com/tags/glsl/</loc>
-    <lastmod>2020-10-05T03:29:07+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/posts/</loc>
-    <lastmod>2020-10-05T03:29:07+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/tags/</loc>
-    <lastmod>2020-10-05T03:29:07+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/</loc>
     <lastmod>2020-10-05T03:29:07+09:00</lastmod>
   </url>
   

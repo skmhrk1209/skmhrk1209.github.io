@@ -108,6 +108,7 @@
 </ol>
 <p>ここ最近のCVPRなどのコンピュータビジョンの学会では3Dの研究が爆発的に増えていて，ビジョンとグラフィクスを行ったり来たりしている研究も多い気がする．特に3D形状をどう表現するかという問題に焦点が当たっており，ボクセルやポイントクラウド，メッシュなどの離散表現ではなく，DNNでSigned Distance Function (SDF)をモデル化 <a href="https://openaccess.thecvf.com/content_CVPR_2019/papers/Park_DeepSDF_Learning_Continuous_Signed_Distance_Functions_for_Shape_Representation_CVPR_2019_paper.pdf">[Park et al., CVPR'19]</a> したり，Occupancy Functionという物体の内部か外部かを判別する2値分類器などをモデル化 <a href="https://openaccess.thecvf.com/content_CVPR_2019/papers/Mescheder_Occupancy_Networks_Learning_3D_Reconstruction_in_Function_Space_CVPR_2019_paper.pdf">[Mescheder et al., CVPR'19]</a> したりして，3D形状を陰関数表現しているのをよく見かける．</p>
 <p>またこれとは別にDifferentiable Rendering <a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Kato_Neural_3D_Mesh_CVPR_2018_paper.pdf">[Kato et al., CVPR'18]</a> という手法がある．これはレンダリングプロセスを微分可能にし，計算グラフに組み込むことで，3D教師データを必要とせず，2D教師データのみで3D形状の学習を行うことができるでものである．言い換えれば，どのような3D形状を学習すれば，それによってレンダリングされた結果が教師である2Dデータと一致するか，ということを学習する．例えばラスタライズベースのレンダリングプロセスの大部分は幾何計算であり微分可能であるが，ラスタライズだけは微分できない．そこで様々な近似勾配が提案されている．</p>
+<br>
 <div align="center">
 <img src="differentiable_rendering.png" width="800">
 <span>Differentiable Rendering: A Survey [Kato et al., 2020]</span>
@@ -122,6 +123,7 @@
 $$\theta^{*}=\text{argmin}_{\theta}\mathcal{L}(\hat{I}, I)$$</p>
 <p>勾配法で最適化するとして
 $$\cfrac{\partial{\mathcal{L}}}{\partial{\theta}}=\sum_{u}\cfrac{\partial{\mathcal{L}}}{\partial{\hat{I}_{u}}}\cfrac{\partial{\hat{I}_{u}}}{\partial{\theta}}$$</p>
+<br>
 <div align="center">
 <img src="ray_casting.png" width="400">
 <p><span>DVR [Niemeyer et al., CVPR'20]</span></p>
@@ -141,14 +143,17 @@ $$\cfrac{\partial{\hat{p}}}{\partial{\theta}}=-(\cfrac{\partial{f_{\theta}(\hat{
 <p>これにより，レイキャスティングによる交点$\hat{p}$を微分可能な形で求める必要はない．
 例えばDVR [1] ではレイ上の点をサンプリングして，Occupancy Networkの出力が初めて0.5を跨いだ点（Occupancy Networkは与えられた点が3Dオブジェクト内部に存在する確率を出力するので，出力が0.5となる点はオブジェクト表面に存在すると推定されたことになる）を交点$\hat{p}$としている．</p>
 <p>他にもDIST [2], SDFDiff [3] ではスフィアトレーシングを用いてレンダリングしており，微分可能な形で交点$\hat{p}$を求める工夫をしている．</p>
+<br>
 <div align="center">
-<img src="sphere_tracing.png" width="430"><img src="algorithm.png" width="370">
+<img src="sphere_tracing.png" width="400">
+<img src="algorithm.png" width="400">
 <p><span>DIST [Liu et al., CVPR'20]</span></p>
 </div>
 <br>
 <p>DIST [2] では以下のような戦略を用いてスフィアトレーシングを加速させている．
 イテレーション毎に計算グラフを構築しているので計算量が多く，そのため近似勾配を用いて対処している．
 イテレーション毎に素直にDNNを通して距離を計算していては，計算グラフが肥大化し，やがてVRAMを食い潰すだろう．</p>
+<br>
 <div align="center">
 <img src="strategies.png" width="800">
 <p><span>DIST [Liu et al., CVPR'20]</span></p>
@@ -179,8 +184,9 @@ Supervision&quot;を扱う．</p>
 <p>今回はGTのレンダリングや，反射モデル，幾何変換のために<a href="https://github.com/facebookresearch/pytorch3d">PyTorch3D</a>を用いた．データセットとしては<a href="https://www.shapenet.org/">ShapeNetCore</a>を用いた．
 このShapeNetCore，3Dモデルが汚いためか，普通にフォンシェーディングすると，めちゃくちゃなシェーディングになった．
 なので，GTのレンダリングにはとりあえずフラットシェーディングを用いている．</p>
+<br>
 <div align="center">
-<img src="car.png" width="400"><img src="motorbike.png" width="400">
+<img src="car.png" width="350"><img src="motorbike.png" width="350">
 <p><span>ShapeNetCore</span></p>
 </div>
 <br>
@@ -261,8 +267,9 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
     <span class="n">ambient_colors</span> <span class="o">=</span> <span class="n">ambient_colors</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">diffuse_colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="n">ambient_colors</span> <span class="o">+</span> <span class="n">diffuse_colors</span><span class="p">)</span> <span class="o">*</span> <span class="n">textures</span> <span class="o">+</span> <span class="n">specular_colors</span>
     <span class="k">return</span> <span class="n">colors</span>
-</code></pre></div><div align="center">
-<img src="sphere.png" width="400">
+</code></pre></div><br>
+<div align="center">
+<img src="sphere.png" width="300">
 </div>
 <br>
 <p>結構不安だが，一応単位球面はレンダリングできていそうなので，これを自動微分の枠組みに組み込む．
