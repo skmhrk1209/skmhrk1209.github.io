@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://hirokisakuma.com/</loc>
+    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
   </url>
@@ -44,11 +49,6 @@
   
   <url>
     <loc>https://hirokisakuma.com/tags/</loc>
-    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
   </url>
   
