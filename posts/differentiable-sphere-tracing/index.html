@@ -200,27 +200,24 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
     <span class="n">signed_distance_function</span><span class="p">,</span> 
     <span class="n">positions</span><span class="p">,</span> 
     <span class="n">directions</span><span class="p">,</span> 
-    <span class="n">embeddings</span><span class="p">,</span> 
     <span class="n">foreground_masks</span><span class="p">,</span> 
     <span class="n">num_iterations</span><span class="p">,</span> 
     <span class="n">convergence_threshold</span><span class="p">,</span>
 <span class="p">):</span>
-
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;-------- sphere tracing started --------&#34;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
-        <span class="n">signed_distances</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
-        <span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span> <span class="o">+</span> <span class="n">directions</span> <span class="o">*</span> <span class="n">signed_distances</span>
+        <span class="n">signed_distances</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">converged</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">positions</span> <span class="o">+</span> <span class="n">directions</span> <span class="o">*</span> <span class="n">signed_distances</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span> <span class="o">+</span> <span class="n">directions</span> <span class="o">*</span> <span class="n">signed_distances</span>
         <span class="n">converged</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">signed_distances</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">convergence_threshold</span>
-        <span class="n">convergence_rate</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">converged</span><span class="p">[</span><span class="n">foreground_masks</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">))</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;iteration {i}: {convergence_rate * 100}</span><span class="si">% c</span><span class="s2">onverged&#34;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">converged</span><span class="p">[</span><span class="n">foreground_masks</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">converged</span><span class="p">[</span><span class="n">foreground_masks</span><span class="p">]</span> <span class="k">if</span> <span class="n">foreground_masks</span> <span class="k">else</span> <span class="n">converged</span><span class="p">):</span>
             <span class="k">break</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;-------- sphere tracing finished --------&#34;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">positions</span><span class="p">,</span> <span class="n">converged</span>
 
 
-<span class="k">def</span> <span class="nf">compute_normal</span><span class="p">(</span><span class="n">signed_distance_function</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">finite_difference_epsilon</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">compute_normal</span><span class="p">(</span><span class="n">signed_distance_function</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">finite_difference_epsilon</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">finite_difference_epsilon</span><span class="p">:</span>
         <span class="n">finite_difference_epsilon</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">new_tensor</span><span class="p">(</span><span class="n">finite_difference_epsilon</span><span class="p">)</span>
@@ -228,23 +225,23 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
         <span class="n">finite_difference_epsilon_x</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">finite_difference_epsilon</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="n">finite_difference_epsilon_y</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">finite_difference_epsilon</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="n">finite_difference_epsilon_z</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">finite_difference_epsilon</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-        <span class="n">normals_x</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">+</span> <span class="n">finite_difference_epsilon_x</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span> <span class="o">-</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">-</span> <span class="n">finite_difference_epsilon_x</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
-        <span class="n">normals_y</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">+</span> <span class="n">finite_difference_epsilon_y</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span> <span class="o">-</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">-</span> <span class="n">finite_difference_epsilon_y</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
-        <span class="n">normals_z</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">+</span> <span class="n">finite_difference_epsilon_z</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span> <span class="o">-</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">-</span> <span class="n">finite_difference_epsilon_z</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+        <span class="n">normals_x</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">+</span> <span class="n">finite_difference_epsilon_x</span><span class="p">)</span> <span class="o">-</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">-</span> <span class="n">finite_difference_epsilon_x</span><span class="p">)</span>
+        <span class="n">normals_y</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">+</span> <span class="n">finite_difference_epsilon_y</span><span class="p">)</span> <span class="o">-</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">-</span> <span class="n">finite_difference_epsilon_y</span><span class="p">)</span>
+        <span class="n">normals_z</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">+</span> <span class="n">finite_difference_epsilon_z</span><span class="p">)</span> <span class="o">-</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span> <span class="o">-</span> <span class="n">finite_difference_epsilon_z</span><span class="p">)</span>
         <span class="n">normals</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">normals_x</span><span class="p">,</span> <span class="n">normals_y</span><span class="p">,</span> <span class="n">normals_z</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
     <span class="k">else</span><span class="p">:</span>
         <span class="n">create_graph</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">requires_grad</span>
         <span class="n">positions</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
-            <span class="n">signed_distances</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+            <span class="n">signed_distances</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
             <span class="n">normals</span><span class="p">,</span> <span class="o">=</span> <span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span>
                 <span class="n">outputs</span><span class="o">=</span><span class="n">signed_distances</span><span class="p">,</span> 
                 <span class="n">inputs</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> 
                 <span class="n">grad_outputs</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">signed_distances</span><span class="p">),</span>
                 <span class="n">create_graph</span><span class="o">=</span><span class="n">create_graph</span><span class="p">,</span>
             <span class="p">)</span>
-    
-    <span class="n">normals</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            
     <span class="k">return</span> <span class="n">normals</span>
 
 
@@ -273,6 +270,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
 </div>
 <br>
 <p>上記の関数を用いて，Constructive Solid Geometry (CSG) をレンダリングしてみた．
+完全なコードはここに置いてある: <a href="https://github.com/skmhrk1209/Sphere-Tracing-PyTorch3D">code</a>
 各プリミティブに対応するSigned Distance Functionは，まだその導出を理解していないものも多く，どこかでちゃんと勉強したいと思う．</p>
 <p>一応スフィアトレーシングは動作していそうなので，これを自動微分の枠組みに組み込む．
 基本的には上記の<code>sphere_tracing(...)</code>を<code>torch.autograd.Function.forward(...)</code>に移植し，
@@ -285,7 +283,6 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
         <span class="n">signed_distance_function</span><span class="p">,</span> 
         <span class="n">positions</span><span class="p">,</span> 
         <span class="n">directions</span><span class="p">,</span> 
-        <span class="n">embeddings</span><span class="p">,</span> 
         <span class="n">foreground_masks</span><span class="p">,</span> 
         <span class="n">num_iterations</span><span class="p">,</span> 
         <span class="n">convergence_threshold</span><span class="p">,</span>
@@ -297,7 +294,6 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
                 <span class="n">signed_distance_function</span><span class="o">=</span><span class="n">signed_distance_function</span><span class="p">,</span> 
                 <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> 
                 <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span> 
-                <span class="n">embeddings</span><span class="o">=</span><span class="n">embeddings</span><span class="p">,</span>
                 <span class="n">foreground_masks</span><span class="o">=</span><span class="n">foreground_masks</span><span class="p">,</span>
                 <span class="n">num_iterations</span><span class="o">=</span><span class="n">num_iterations</span><span class="p">,</span> 
                 <span class="n">convergence_threshold</span><span class="o">=</span><span class="n">convergence_threshold</span><span class="p">,</span>
@@ -305,7 +301,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
             <span class="n">positions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">converged</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">positions</span><span class="p">))</span>
 
         <span class="c1"># save tensors for backward pass</span>
-        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">foreground_masks</span><span class="p">,</span> <span class="n">converged</span><span class="p">)</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">foreground_masks</span><span class="p">,</span> <span class="n">converged</span><span class="p">)</span>
         <span class="n">ctx</span><span class="o">.</span><span class="n">signed_distance_function</span> <span class="o">=</span> <span class="n">signed_distance_function</span>
         <span class="n">ctx</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
 
@@ -315,7 +311,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
     <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_outputs</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">):</span>
         
         <span class="c1"># restore tensors from forward pass</span>
-        <span class="n">positions</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">foreground_masks</span><span class="p">,</span> <span class="n">converged</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+        <span class="n">positions</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">foreground_masks</span><span class="p">,</span> <span class="n">converged</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
         <span class="n">signed_distance_function</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">signed_distance_function</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">parameters</span>
 
@@ -323,7 +319,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
             <span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
             <span class="n">positions</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-            <span class="n">signed_distances</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+            <span class="n">signed_distances</span> <span class="o">=</span> <span class="n">signed_distance_function</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
             <span class="n">grad_positions</span><span class="p">,</span> <span class="o">=</span> <span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span>
                 <span class="n">outputs</span><span class="o">=</span><span class="n">signed_distances</span><span class="p">,</span> 
                 <span class="n">inputs</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> 
@@ -340,13 +336,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
             <span class="p">)</span>
             <span class="n">grad_outputs</span> <span class="o">=</span> <span class="o">-</span><span class="n">grad_outputs_dot_directions</span> <span class="o">/</span> <span class="n">grad_positions_dot_directions</span>
             <span class="c1"># NOTE: zero gradient for unconverged points </span>
-            <span class="c1"># grad_outputs = torch.where(converged, grad_outputs, torch.zeros_like(grad_outputs))</span>
-            <span class="n">grad_embeddings</span><span class="p">,</span> <span class="o">=</span> <span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span>
-                <span class="n">outputs</span><span class="o">=</span><span class="n">signed_distances</span><span class="p">,</span> 
-                <span class="n">inputs</span><span class="o">=</span><span class="n">embeddings</span><span class="p">,</span> 
-                <span class="n">grad_outputs</span><span class="o">=</span><span class="n">grad_outputs</span><span class="p">,</span> 
-                <span class="n">retain_graph</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">grad_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">converged</span><span class="p">,</span> <span class="n">grad_outputs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">grad_outputs</span><span class="p">))</span>
             <span class="n">grad_parameters</span> <span class="o">=</span> <span class="n">autograd</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span>
                 <span class="n">outputs</span><span class="o">=</span><span class="n">signed_distances</span><span class="p">,</span> 
                 <span class="n">inputs</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> 
@@ -354,7 +344,7 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
                 <span class="n">retain_graph</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">grad_embeddings</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">grad_parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">grad_parameters</span><span class="p">)</span>
 </code></pre></div><p>これで一応学習させてみるが，どうせ最初からうまくはいかないので，適宜修正を加えていくことになるだろう．
 損失関数は単純なL1 lossを用いてみたが，SDFDiff [3] で提案されているSigned Distance Functionの勾配やラプラシアンに関する正則化項を入れたり，他にも実装レベルの様々なトリックが必要になってくるかもしれない．</p>
 <p>結果はうまくいき次第載せようと思う．</p>
