@@ -173,6 +173,7 @@ $$\cfrac{\partial{\hat{p}}}{\partial{\theta}}=-(\cfrac{\partial{f_{\theta}(\hat{
 <p>コアのアイデアは多分理解できたので，実装に移る．
 今回は DVR [1] をベースにOccupancy FunctionではなくSigned Distance FunctionをDNNでモデル化した．
 学習の流れとしては，以下のように行った．論文の再現は目的ではないので，実験設定は異なっている．
+自分なりに理解しやすく，まずはなるべくシンプルになるように書いたので，実装は元論文とはだいぶ違うかもしれない．
 タスクとしては&quot;Single-View Reconstruction with Multi-View
 Supervision&quot;を扱う．</p>
 <ol>
@@ -191,7 +192,6 @@ Supervision&quot;を扱う．</p>
 </div>
 <br>
 <p>まずは普通のスフィアトレーシングをPyTorchで実装してみる．
-自分なりに理解しやすく，まずはなるべくシンプルになるように書いたので，実装は元論文とはだいぶ違うかもしれない．
 カメラやライトはPyTorch3Dのクラスを用いている．
 PyTorch3Dはかなり新しいライブラリでまだ洗練されていない部分も多く，結構苦労した．
 特にテンソルの形状のミスマッチに起因するエラーが多く，自分で書き直していかないといけなかった．
