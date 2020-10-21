@@ -107,6 +107,12 @@
 <li><a href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Jiang_SDFDiff_Differentiable_Rendering_of_Signed_Distance_Fields_for_3D_Shape_CVPR_2020_paper.pdf">SDFDiff: Differentiable Rendering of Signed Distance Fields for 3D Shape Optimization [Jiang et al., CVPR'20]</a></li>
 </ol>
 <p>ここ最近のCVPRなどのコンピュータビジョンの学会では3Dの研究が爆発的に増えていて，ビジョンとグラフィクスを行ったり来たりしている研究も多い気がする．特に3D形状をどう表現するかという問題に焦点が当たっており，ボクセルやポイントクラウド，メッシュなどの離散表現ではなく，DNNでSigned Distance Function (SDF)をモデル化 <a href="https://openaccess.thecvf.com/content_CVPR_2019/papers/Park_DeepSDF_Learning_Continuous_Signed_Distance_Functions_for_Shape_Representation_CVPR_2019_paper.pdf">[Park et al., CVPR'19]</a> したり，Occupancy Functionという物体の内部か外部かを判別する2値分類器などをモデル化 <a href="https://openaccess.thecvf.com/content_CVPR_2019/papers/Mescheder_Occupancy_Networks_Learning_3D_Reconstruction_in_Function_Space_CVPR_2019_paper.pdf">[Mescheder et al., CVPR'19]</a> したりして，3D形状を陰関数表現しているのをよく見かける．</p>
+<br>
+<div align="center">
+<img src="implicit_function.png" width="800">
+<p><span>Differentiable Rendering: A Survey [Kato et al., 2020]</span></p>
+</div>
+<br>
 <p>またこれとは別にDifferentiable Rendering <a href="https://openaccess.thecvf.com/content_cvpr_2018/papers/Kato_Neural_3D_Mesh_CVPR_2018_paper.pdf">[Kato et al., CVPR'18]</a> という手法がある．これはレンダリングプロセスを微分可能にし，計算グラフに組み込むことで，3D教師データを必要とせず，2D教師データのみで3D形状の学習を行うことができるでものである．言い換えれば，どのような3D形状を学習すれば，それによってレンダリングされた結果が教師である2Dデータと一致するか，ということを学習する．例えばラスタライズベースのレンダリングプロセスの大部分は幾何計算であり微分可能であるが，ラスタライズだけは微分できない．そこで様々な近似勾配が提案されている．</p>
 <br>
 <div align="center">
@@ -266,7 +272,8 @@ PyTorch3Dはかなり新しいライブラリでまだ洗練されていない�
     <span class="k">return</span> <span class="n">colors</span>
 </code></pre></div><br>
 <div align="center">
-<img src="examples.png" width="800">
+<img src="csg.png" width="800">
+<p><span>Constructive Solid Geometry (CSG)</span></p>
 </div>
 <br>
 <p>上記の関数を用いて，Constructive Solid Geometry (CSG) をレンダリングしてみた．
