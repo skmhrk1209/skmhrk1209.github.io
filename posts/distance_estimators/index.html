@@ -133,7 +133,7 @@ $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 <p><a href="http://pi.math.cornell.edu/~hubbard/OrsayEnglish.pdf">The Orsay Notes [Douady and Hubbard, 1984]</a> によると，点$z$におけるジュリア集合$\mathcal{J_{c}}$に対するポテンシャル$G(z)$は以下で与えられる．</p>
 <p>$$G(z)=\lim_{n \to \infty}\cfrac{1}{2^{n}}log|f_{c}^{n}(z)|$$</p>
 <p>$\mathcal{J_{c}}$の定義から，$\mathcal{J_{c}}$に含まれる点$z$で$G(z)=0$となる．
-このポテンシャル$G$を用いると，$\mathcal{J_{c}}$の外側のある点$z$から$\mathcal{J_{c}}$の境界までの距離$d(z)$のboundは以下のように導かれる．</p>
+このポテンシャル$G(z)$を用いると，$\mathcal{J_{c}}$の外側のある点$z$から$\mathcal{J_{c}}$の境界までの距離$d(z)$のboundは以下のように導かれる．</p>
 <p>$$\cfrac{\sinh{G(z)}}{2e^{G(z)}|G'(z)|}&lt;d(z)&lt;\cfrac{2\sinh{G(z)}}{|G'(z)|}$$</p>
 <p><a href="https://www.springer.com/gp/book/9781461283492">The Science of Fractal Images [Fisher, 1988]</a> のAppendix Dにここの導出が詳しく書いてある．
 実用上は$z$が$\mathcal{J_{c}}$に十分近いとして，</p>
@@ -142,7 +142,7 @@ $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 いずれにせよ下限がわかれば，その分だけレイを進めることができそうだ．</p>
 <p>ここで，${f_{c}^{n}}'(z)$はどうやって求めるのだろう．
 考えられるのは数値微分か自動微分．今回は双対数（Dual Number）を用いたフォワード型の自動微分を行った．
-今回微分したい$f_{c}$は入力，出力ともにクォータニオンなので，クォータニオンの双対数（Dual Quaternion）を考えることになり，結構ややこしそうだ．</p>
+今回微分したい$f_{c}(z)$は入力，出力ともにクォータニオンなので，クォータニオンの双対数（Dual Quaternion）を考えることになり，結構ややこしそうだ．</p>
 <p>まずはクォータニオン用の演算を定義しておく．</p>
 <div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// ---------------- quaternion ---------------- //
 </span><span class="c1"></span>
