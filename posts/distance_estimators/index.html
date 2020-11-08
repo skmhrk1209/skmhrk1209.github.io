@@ -12,7 +12,7 @@
 	
     
     
-    <meta name="description" content="fractalの有名な例としてJulia集合，Mandelbrot集合などがある． 以下のような2次関数が与えられた際に， $$f_{c}(z)=z^{2}&#43;c$$ Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\" />
+    <meta name="description" content="フラクタルの有名な例としてJulia集合，Mandelbrot集合などがある． 以下のような2次関数が与えられた際に， $$f_{c}(z)=z^{2}&#43;c$$ Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\ma" />
     
 
     
@@ -109,13 +109,13 @@ forwardではスフィアトレーシングによるレンダリングを行い�
 
 でも実際はOccupancy Networkを用いてもスフィアトレーシングできそうなことが分かってきた．
 -->
-<p>fractalの有名な例としてJulia集合，Mandelbrot集合などがある．
+<p>フラクタルの有名な例としてJulia集合，Mandelbrot集合などがある．
 以下のような2次関数が与えられた際に，</p>
 <p>$$f_{c}(z)=z^{2}+c$$</p>
 <p>Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\mathcal{M}$は以下で定義される．</p>
 <p>$$\mathcal{J_{c}}=\{z: \lim_{n \to \infty}f_{c}^{n}(z) \not\to \infty\}$$
 $$\mathcal{M}=\{c: \lim_{n \to \infty}f_{c}^{n}(z) \not\to \infty, f'_{c}(z)=0\}$$</p>
-<p>$z,c$は通常複素数であり，$\mathcal{J_{c}},\mathcal{M}$を複素平面上に表すと，フラクタル図形が現れる．</p>
+<p>$z,c$は通常複素数であり，$\mathcal{J_{c}},\mathcal{M}$を複素平面上に表すと，フラクタルが現れる．</p>
 <br>
 <div align="center">
 <img src="julia2d.png" width="350">
@@ -124,13 +124,13 @@ $$\mathcal{M}=\{c: \lim_{n \to \infty}f_{c}^{n}(z) \not\to \infty, f'_{c}(z)=0\}
 </div>
 <br>
 <p>ここでこれら$\mathcal{J_{c}},\mathcal{M}$を3次元に拡張したいと思うのは自然なことであり，$z,c$を四元数（
-クォータニオン）として表して，最後に適当な超平面に射影すれば，実際に3次元のフラクタル図形を得ることができる．
+クォータニオン）として表して，最後に適当な超平面に射影すれば，実際に3次元のフラクタルを得ることができる．
 ここでなぜ三元数を考えないのかと思ったが，$f_{c}$を適用することを考えると，$z,c$が定義される代数系は加法と乗法について閉じている必要があるが，三元数は乗法について閉じていないので，三元数を通して$\mathcal{J_{c}},\mathcal{M}$を得ることはできない，ということらしい．
 実際に，三元数$a+bi+cj$を考え，$$ij=\alpha+\beta i+\gamma j$$を満たす実数$\alpha,\beta,\gamma$が存在するか調べると，
 $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 より，$$\gamma^{2}+1=0$$を満たす実数$\gamma$は存在しない．よって三元数は乗法について閉じていない．
 ということでわざわざ四元数を持ち出しているということだ．</p>
-<p>これでクォータニオンを持ち込めば，3次元のフラクタル図形が得られることが分かったが，それをどうレンダリングすればいいのだろう．
+<p>これでクォータニオンを持ち込めば，3次元のフラクタルが得られることが分かったが，それをどうレンダリングすればいいのだろう．
 2次元の場合は各ピクセルについて単に$\lim_{n \to \infty}f_{c}(z)$が収束するか否かを調べれば良かったが，3次元の場合はピクセルに向けて飛ばしたレイ上の全ての点をしらみつぶしに調べるわけにもいかない．
 フラクタルまでの距離がわかれば，スフィアトレーシングできるが，結論から言うと$\mathcal{J_{c}},\mathcal{M}$に対するDistance Functionは存在しない．</p>
 <p>が，Distance Functionの近似なら求めることができるようだ．</p>

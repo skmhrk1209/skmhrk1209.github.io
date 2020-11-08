@@ -13,7 +13,7 @@
       <pubDate>Sun, 25 Oct 2020 20:25:53 +0900</pubDate>
       
       <guid>https://hirokisakuma.com/posts/distance_estimators/</guid>
-      <description>fractalの有名な例としてJulia集合，Mandelbrot集合などがある． 以下のような2次関数が与えられた際に， $$f_{c}(z)=z^{2}+c$$ Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\</description>
+      <description>フラクタルの有名な例としてJulia集合，Mandelbrot集合などがある． 以下のような2次関数が与えられた際に， $$f_{c}(z)=z^{2}+c$$ Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\ma</description>
     </item>
     
     <item>
