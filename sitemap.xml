@@ -4,12 +4,42 @@
   
   <url>
     <loc>https://hirokisakuma.com/</loc>
-    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
-    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/posts/distance_estimators/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/fractals/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/glsl/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/posts/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/sphere-tracing/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/tags/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
   
   <url>
@@ -28,11 +58,6 @@
   </url>
   
   <url>
-    <loc>https://hirokisakuma.com/posts/</loc>
-    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://hirokisakuma.com/tags/pytorch/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
   </url>
@@ -43,27 +68,12 @@
   </url>
   
   <url>
-    <loc>https://hirokisakuma.com/tags/sphere-tracing/</loc>
-    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/tags/</loc>
-    <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://hirokisakuma.com/tags/cinder/</loc>
     <lastmod>2020-10-05T03:29:07+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://hirokisakuma.com/posts/environment-mapping/</loc>
-    <lastmod>2020-10-05T03:29:07+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/tags/glsl/</loc>
     <lastmod>2020-10-05T03:29:07+09:00</lastmod>
   </url>
   

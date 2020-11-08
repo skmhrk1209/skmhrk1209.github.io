@@ -6,7 +6,16 @@
     <description>Recent content in Posts on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 09 Oct 2020 03:00:28 +0900</lastBuildDate><atom:link href="https://hirokisakuma.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 25 Oct 2020 20:25:53 +0900</lastBuildDate><atom:link href="https://hirokisakuma.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Distance Estimators for 3D Fractals</title>
+      <link>https://hirokisakuma.com/posts/distance_estimators/</link>
+      <pubDate>Sun, 25 Oct 2020 20:25:53 +0900</pubDate>
+      
+      <guid>https://hirokisakuma.com/posts/distance_estimators/</guid>
+      <description>先日のポストでは DVR [Niemeyer et al., CVPR&#39;20] を参考にDNNでSigned Distance Function (SDF)をモデル化し，学習させてみた． forwardではスフィアトレーシングによるレンダリングを行い，backwardではオブジェクトとの交</description>
+    </item>
+    
     <item>
       <title>Differentiable Sphere Tracing</title>
       <link>https://hirokisakuma.com/posts/differentiable-sphere-tracing/</link>
