@@ -12,7 +12,7 @@
 	
     
     
-    <meta name="description" content="先日のポストでは DVR [Niemeyer et al., CVPR&#39;20] を参考にDNNでSigned Distance Function (SDF)をモデル化し，学習させてみた． forwardではスフィアトレーシングによるレンダリングを行い，backwardではオブジェクトとの交" />
+    <meta name="description" content="fractalの有名な例としてJulia集合，Mandelbrot集合などがある． 以下のような2次関数が与えられた際に， $$f_{c}(z)=z^{2}&#43;c$$ Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\" />
     
 
     
@@ -100,12 +100,16 @@
                         <h2><a href='/posts/distance_estimators/'>Distance Estimators for 3D Fractals</a></h2>
                         <span class="date">2020.10.25</span>
                     </div>
-                    <div class="post_content markdown"><p>先日のポストでは <a href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeyer_Differentiable_Volumetric_Rendering_Learning_Implicit_3D_Representations_Without_3D_Supervision_CVPR_2020_paper.pdf">DVR [Niemeyer et al., CVPR'20]</a> を参考にDNNでSigned Distance Function (SDF)をモデル化し，学習させてみた．
-forwardではスフィアトレーシングによるレンダリングを行い，backwardではオブジェクトとの交点の微分を陰関数微分により求めることで，微分可能レンダリングの枠組みでDNNの最適化を試みた．しかし，現状全く学習がうまく進んでいない．</p>
-<p><a href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeyer_Differentiable_Volumetric_Rendering_Learning_Implicit_3D_Representations_Without_3D_Supervision_CVPR_2020_paper.pdf">DVR [Niemeyer et al., CVPR'20]</a> ではSigned Distance Functionではなく，Occupancy Networkをモデル化している．なぜこれをSigned Distance Functionに置き換えたのかというと，GLSLでそのままスフィアトレーシングによりレンダリングしたかったからだ．
-しかしOccupancy Networkの方が，例えば物体の投影された領域が分かっている場合などは，教師信号を与えることができる点で最適化しやすいと思われる．また，Signed Distance Functionをモデル化している <a href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Jiang_SDFDiff_Differentiable_Rendering_of_Signed_Distance_Fields_for_3D_Shape_CVPR_2020_paper.pdf">SDFDiff [Jiang et al., CVPR'20]</a> などは3D deconvolutionによるボクセルベースのSigned Distance Functionを用いており，ビジョンにおける画像生成が2D deconvolutionによって成功していることを考えると，convolutionの力を借りないと難しいのかもしれない．</p>
-<p>でも実際はOccupancy Networkを用いてもスフィアトレーシングできそうなことが分かってきた．</p>
-<p>一旦話が少し逸れるが，fractalの有名な例としてJulia集合，Mandelbrot集合などがある．
+                    <div class="post_content markdown"><!-- 
+先日のポストでは [DVR [Niemeyer et al., CVPR'20]](https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeyer_Differentiable_Volumetric_Rendering_Learning_Implicit_3D_Representations_Without_3D_Supervision_CVPR_2020_paper.pdf) を参考にDNNでSigned Distance Function (SDF)をモデル化し，学習させてみた．
+forwardではスフィアトレーシングによるレンダリングを行い，backwardではオブジェクトとの交点の微分を陰関数微分により求めることで，微分可能レンダリングの枠組みでDNNの最適化を試みた．しかし，現状全く学習がうまく進んでいない．
+
+[DVR [Niemeyer et al., CVPR'20]](https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeyer_Differentiable_Volumetric_Rendering_Learning_Implicit_3D_Representations_Without_3D_Supervision_CVPR_2020_paper.pdf) ではSigned Distance Functionではなく，Occupancy Networkをモデル化している．なぜこれをSigned Distance Functionに置き換えたのかというと，GLSLでそのままスフィアトレーシングによりレンダリングしたかったからだ．
+しかしOccupancy Networkの方が，例えば物体の投影された領域が分かっている場合などは，教師信号を与えることができる点で最適化しやすいと思われる．また，Signed Distance Functionをモデル化している [SDFDiff [Jiang et al., CVPR'20]](https://openaccess.thecvf.com/content_CVPR_2020/papers/Jiang_SDFDiff_Differentiable_Rendering_of_Signed_Distance_Fields_for_3D_Shape_CVPR_2020_paper.pdf) などは3D deconvolutionによるボクセルベースのSigned Distance Functionを用いており，ビジョンにおける画像生成が2D deconvolutionによって成功していることを考えると，convolutionの力を借りないと難しいのかもしれない．
+
+でも実際はOccupancy Networkを用いてもスフィアトレーシングできそうなことが分かってきた．
+-->
+<p>fractalの有名な例としてJulia集合，Mandelbrot集合などがある．
 以下のような2次関数が与えられた際に，</p>
 <p>$$f_{c}(z)=z^{2}+c$$</p>
 <p>Julia集合$\mathcal{J_{c}}$，Mandelbrot集合$\mathcal{M}$は以下で定義される．</p>
