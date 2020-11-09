@@ -116,7 +116,7 @@ $$\mathcal{M}=\{c: \lim_{n \to \infty}f_{c}^{n}(z) \not\to \infty, f'_{c}(z)=0\}
 <div align="center">
 <img src="julia2d.png" width="350">
 <img src="mandelbrot2d.png" width="350">
-<span>2D Julia set & Mandelbrot set</span>
+<p><span>2D Julia set &amp; Mandelbrot set</span></p>
 </div>
 <br>
 <p>ここでこれら$\mathcal{J_{c}},\mathcal{M}$を3次元に拡張したいと思うのは自然なことであり，$z,c$を四元数（
@@ -130,7 +130,7 @@ $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 2次元の場合は各ピクセルについて単に$\lim_{n \to \infty}f_{c}(z)$が収束するか否かを調べれば良かったが，3次元の場合はピクセルに向けて飛ばしたレイ上の全ての点をしらみつぶしに調べるわけにもいかない．
 フラクタルまでの距離がわかれば，スフィアトレーシングできるが，結論から言うと$\mathcal{J_{c}},\mathcal{M}$に対するDistance Functionは存在しない．</p>
 <p>が，Distance Functionの近似なら求めることができるようだ．</p>
-<p><a href="http://pi.math.cornell.edu/~hubbard/OrsayEnglish.pdf">The Orsay Notes [Douady and Hubbard, 1984]</a> によると，点$z$におけるジュリア集合$\mathcal{J_{c}}$に対するポテンシャル$G(z)$は以下で与えられる．</p>
+<p><a href="http://pi.math.cornell.edu/~hubbard/OrsayEnglish.pdf">The Orsay Notes [Douady and Hubbard, 1984]</a> によると，点$z$におけるJulia集合$\mathcal{J_{c}}$に対するポテンシャル$G(z)$は以下で与えられる．</p>
 <p>$$G(z)=\lim_{n \to \infty}\cfrac{1}{2^{n}}log|f_{c}^{n}(z)|$$</p>
 <p>$\mathcal{J_{c}}$の定義から，$\mathcal{J_{c}}$に含まれる点$z$で$G(z)=0$となる．
 このポテンシャル$G(z)$を用いると，$\mathcal{J_{c}}$の外側のある点$z$から$\mathcal{J_{c}}$の境界までの距離$d(z)$のboundは以下のように導かれる．</p>
@@ -235,7 +235,7 @@ $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 いろいろな文献をみて回ったが，結局納得のできる答えは見つからなかった．</p>
 <p>ただ，僕のMacBookでレンダリングすることを考えると，毎イテレーションでヤコビ行列を計算したくないのもあり，<a href="https://www.cs.cmu.edu/~kmcrane/Projects/QuaternionJulia/paper.pdf">Ray Tracing Quaternion Julia Sets on the GPU [Crane, 2015]</a> に従って，クォータニオンの実部に関する微分のみ計算することにした．</p>
 <p>この場合はDual Quaternionの虚部のクォータニオンの実部を$1$，虚部を$0$にすれば良い．（ややこしい&hellip;）</p>
-<p>これでジュリア集合における${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$を同時に求めることができそうだ．
+<p>これでJulia集合における${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$を同時に求めることができそうだ．
 ${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$がわかれば，距離推定により，スフィアトレーシングできる．
 距離推定のソースは以下．</p>
 <div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// ---------------- fractals ---------------- //
@@ -435,14 +435,14 @@ $$\nabla G(z)=\cfrac{1}{2^{n}|f_{c}^{n}(z)|}\nabla\sqrt{f_{c}^{n}(z)^{T}f_{c}^{n
 <img src="julia3d_2.png" width="350">
 <img src="julia3d_3.png" width="350">
 <img src="julia3d_4.png" width="350">
-<span>3D Julia set</span>
+<p><span>3D Julia set</span></p>
 </div>
 <br>
 <br>
 <div align="center">
 <img src="mandelbrot3d_1.png" width="350">
 <img src="mandelbrot3d_2.png" width="350">
-<span>3D Mandelbrot set</span>
+<p><span>3D Mandelbrot set</span></p>
 </div>
 <br>
 </div>
