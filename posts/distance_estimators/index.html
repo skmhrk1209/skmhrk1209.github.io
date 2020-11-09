@@ -233,7 +233,7 @@ $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 <p>今回で言うと，Julia集合$\mathcal{J_{c}}$に関しては$z$の虚部を$1$，Mandelbrot集合$\mathcal{M}$に関しては$c$の虚部を$1$にしておく．</p>
 <p>つまづいたところは，${f_{c}^{n}}(z)$は入力，出力ともにクォータニオンなので，${f_{c}^{n}}'(z)$はヤコビ行列となりそうだが，$|{f_{c}^{n}}'(z)|$は何を意味するのか，ということだった．
 いろいろな文献をみて回ったが，結局納得のできる答えは見つからなかった．</p>
-<p>ただ，僕のMacBookでレンダリングすることを考えると，毎イテレーションでヤコビ行列を計算したくないのもあり，<a href="https://www.cs.cmu.edu/~kmcrane/Projects/QuaternionJulia/paper.pdf">Ray Tracing Quaternion Julia Sets on the GPU</a> に従って，クォータニオンの実部に関する微分のみ計算することにした．</p>
+<p>ただ，僕のMacBookでレンダリングすることを考えると，毎イテレーションでヤコビ行列を計算したくないのもあり，<a href="https://www.cs.cmu.edu/~kmcrane/Projects/QuaternionJulia/paper.pdf">Ray Tracing Quaternion Julia Sets on the GPU [Crane, 2015]</a> に従って，クォータニオンの実部に関する微分のみ計算することにした．</p>
 <p>この場合はDual Quaternionの虚部のクォータニオンの実部を$1$，虚部を$0$にすれば良い．（ややこしい&hellip;）</p>
 <p>これでジュリア集合における${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$を同時に求めることができそうだ．
 ${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$がわかれば，距離推定により，スフィアトレーシングできる．
@@ -271,7 +271,14 @@ ${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$がわかれば，距離推定により，�
 $$G(z)=\lim_{n \to \infty}\cfrac{1}{2^{n}}log|f_{c}^{n}(z)|$$より，
 $$\nabla G(z)=\cfrac{1}{2^{n}|f_{c}^{n}(z)|}\nabla\sqrt{f_{c}^{n}(z)^{T}f_{c}^{n}(z)}=\cfrac{{f_{c}^{n}}'(z)^{T}f_{c}^{n}(z)}{2^{n}|f_{c}^{n}(z)|^{2}}$$</p>
 <p>これで距離推定と同時に法線も推定できることがわかった．</p>
-<p>ただ法線に関してはヤコビ行列を計算したいので，DualQuaternionの虚部がmat4になる．mat4についてDualQuaternionの演算を定義するのは大変なので，シンプルにchain-ruleでヤコビ行列を追跡していった．というかそもそも今回双対数を導入する必要はなかった気もするが，これを機にいろいろ知れたし．これはこれで良かったと思う．
+<p>ただ法線に関してはヤコビ行列を計算したいので，DualQuaternionの虚部がmat4になる．mat4についてDualQuaternionの演算を定義するのは大変なので，シンプルにchain ruleでヤコビ行列を追跡していった．</p>
+<p>$$f_{c}^{n}(z)=(f_{c}^{n-1}(z))^{2}+c$$</p>
+<p>より，</p>
+<p>$${f_{c}^{n}}’(z)=2\begin{pmatrix}f_{c}^{n-1}(z)_{x} &amp; -f_{c}^{n-1}(z)_{y} &amp; -f_{c}^{n-1}(z)_{z} &amp; -f_{c}^{n-1}(z)_{w}\\ f_{c}^{n-1}(z)_{y} &amp; f_{c}^{n-1}(z)_{x} &amp; 0 &amp; 0\\ f_{c}^{n-1}(z)_{z} &amp; 0 &amp; f_{c}^{n-1}(z)_{x} &amp; 0\\ f_{c}^{n-1}(z)_{w} &amp; 0 &amp; 0 &amp; f_{c}^{n-1}(z)_{x}\end{pmatrix}{f_{c}^{n-1}}'(z)$$</p>
+<p>これで$f_{c}^{n}(z)$の計算と同時に${f_{c}^{n}}'(z)$も計算できる．
+最初以下のように普通に計算しようとしたが，クォータニオンの場合にはそもそも計算できなかったので，上式は手で微分して突っ込んだ．</p>
+<p>$${f_{c}^{n}}’(z)=2{f_{c}^{n-1}}(z){f_{c}^{n-1}}'(z)$$</p>
+<p>chain ruleでこんなに簡単に追跡できるなら，双対数を導入する必要性はなかった気もするが，これを機にいろいろ知れたし．これはこれで良かったと思う．
 法線推定のソースは以下．</p>
 <div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// ---------------- fractals ---------------- //
 </span><span class="c1"></span>
@@ -281,7 +288,7 @@ $$\nabla G(z)=\cfrac{1}{2^{n}|f_{c}^{n}(z)|}\nabla\sqrt{f_{c}^{n}(z)^{T}f_{c}^{n
 </span><span class="c1"></span>    <span class="n">mat4</span> <span class="n">J</span> <span class="o">=</span> <span class="n">mat4</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">juliaIterations</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="c1">// forward-mode automatic differentiation
+        <span class="c1">// forward-mode manual differentiation
 </span><span class="c1"></span>        <span class="c1">// NOTE: glsl uses column-major matrices
 </span><span class="c1"></span>        <span class="n">J</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mat4</span><span class="p">(</span>
             <span class="o">+</span><span class="n">z</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">.</span><span class="n">w</span><span class="p">,</span>
@@ -302,7 +309,7 @@ $$\nabla G(z)=\cfrac{1}{2^{n}|f_{c}^{n}(z)|}\nabla\sqrt{f_{c}^{n}(z)^{T}f_{c}^{n
 </span><span class="c1"></span>    <span class="n">mat4</span> <span class="n">J</span> <span class="o">=</span> <span class="n">mat4</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span>
     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">mandelbrotIterations</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="c1">// forward-mode automatic differentiation
+        <span class="c1">// forward-mode manual differentiation
 </span><span class="c1"></span>        <span class="c1">// NOTE: glsl uses column-major matrices
 </span><span class="c1"></span>        <span class="n">J</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mat4</span><span class="p">(</span>
             <span class="o">+</span><span class="n">z</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">.</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">.</span><span class="n">w</span><span class="p">,</span>
@@ -316,7 +323,7 @@ $$\nabla G(z)=\cfrac{1}{2^{n}|f_{c}^{n}(z)|}\nabla\sqrt{f_{c}^{n}(z)^{T}f_{c}^{n
     
     <span class="k">return</span> <span class="n">z</span> <span class="o">*</span> <span class="n">J</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div><p>これで法線を使ってシェーディングできる．今回はシンプルなPhong反射モデルを使ってシェーディングした．
+</code></pre></div><p>これで推定された法線を使ってシェーディングできる．今回はシンプルなPhong反射モデルを使ってシェーディングした．
 残りのソースは以下．</p>
 <div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="cp">#version 150
 </span><span class="cp"></span>
