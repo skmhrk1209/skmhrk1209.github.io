@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Max/MSP on </title>
+    <title>Max/MSP on Hiroki Sakuma</title>
     <link>https://hirokisakuma.com/tags/max/msp/</link>
-    <description>Recent content in Max/MSP on </description>
+    <description>Recent content in Max/MSP on Hiroki Sakuma</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>ja</language><atom:link href="https://hirokisakuma.com/tags/max/msp/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language><atom:link href="https://hirokisakuma.com/tags/max/msp/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Max/MSPでPythonを使う</title>
-      <link>https://hirokisakuma.com/posts/max-msp-python/</link>
+      <link>https://hirokisakuma.com/posts/max/msp%E3%81%A7python%E3%82%92%E4%BD%BF%E3%81%86/</link>
       <pubDate>Tue, 11 Aug 2020 23:24:00 +0900</pubDate>
       
-      <guid>https://hirokisakuma.com/posts/max-msp-python/</guid>
-      <description>Max/MSPでは従来のグラフィカルなプログラミング以外にもGenやJavaScriptなどのテキストベースのプログラミングもサポートされている． CやJavaでexternalを開発することもできるが</description>
+      <guid>https://hirokisakuma.com/posts/max/msp%E3%81%A7python%E3%82%92%E4%BD%BF%E3%81%86/</guid>
+      <description>Max/MSPでは従来のグラフィカルなプログラミング以外にもGenやJavaScriptなどのテキストベースのプログラミングもサポートされて</description>
     </item>
     
   </channel>

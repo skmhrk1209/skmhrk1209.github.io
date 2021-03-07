@@ -3,17 +3,12 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://hirokisakuma.com/</loc>
-    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://hirokisakuma.com/posts/distance_estimators/</loc>
+    <loc>https://hirokisakuma.com/posts/distance-estimators-for-3d-fractals/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
   
@@ -24,6 +19,11 @@
   
   <url>
     <loc>https://hirokisakuma.com/tags/glsl/</loc>
+    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
   
@@ -83,7 +83,7 @@
   </url>
   
   <url>
-    <loc>https://hirokisakuma.com/posts/music/</loc>
+    <loc>https://hirokisakuma.com/posts/%E6%9C%80%E8%BF%91%E8%81%B4%E3%81%84%E3%81%A6%E3%81%84%E3%82%8B%E9%9F%B3%E6%A5%BD/</loc>
     <lastmod>2020-10-01T23:56:15+09:00</lastmod>
   </url>
   
@@ -93,7 +93,7 @@
   </url>
   
   <url>
-    <loc>https://hirokisakuma.com/posts/max-msp-python/</loc>
+    <loc>https://hirokisakuma.com/posts/max/msp%E3%81%A7python%E3%82%92%E4%BD%BF%E3%81%86/</loc>
     <lastmod>2020-08-11T23:24:00+09:00</lastmod>
   </url>
   

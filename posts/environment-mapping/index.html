@@ -1,115 +1,117 @@
 <!DOCTYPE html>
-<html lang="ja" >
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="author" content="Hiroki Sakuma" />
-	
-	
-	
-	<title>Environment Mapping ｜ </title>
-	
-    
-    
-    <meta name="description" content="前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した． 今回は環境マッピングの原理を理解し，GLSLコードに落とし込み" />
-    
+<html lang="en-us">
+  <head>
+    <title>Environment Mapping | Hiroki Sakuma</title>
 
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
+<meta name="viewport" content="width=device-width,minimum-scale=1">
+<meta name="description" content="">
+<meta name="generator" content="Hugo 0.80.0" />
+
+
+  <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+
+
+<link rel="stylesheet" href="/css/style.css">
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+
+ 
     
-    
-    <meta name="keywords" content="Max/MSP, GLSL, Cinder, PyTorch, PyTorch3D" />
-    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-179623902-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+
+
+
+
+
+  </head>
+
+  <body>
+    <nav class="navigation">
+	
+		<a href="/"> <span class="arrow">←</span>Home</a>
+	
+	<a href="/posts">Archive</a>
+	<a href="/tags">Tags</a>
+	<a href="/about">About</a>
 
 	
-    
-    <link rel="shortcut icon" href="https://hirokisakuma.com/images/favicon.ico" />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="https://hirokisakuma.com/css/normalize.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="https://hirokisakuma.com/css/zozo.css" />
-	<link rel="stylesheet" type="text/css" media="screen" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="https://hirokisakuma.com/css/highlight.css" />
+	
+	  <a class="button" href="https://hirokisakuma.com/index.xml">Subscribe</a>
+	
+</nav>
 
-    
-    
-</head>
 
-<body>
-    <div class="main animate__animated animate__fadeInDown">
-        <div class="nav_container animated fadeInDown">
-    <div class="site_nav" id="site_nav">
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/posts/">Archive</a>
-            </li>
-            
-            <li>
-                <a href="/tags/">Tags</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-        </ul>
+    <main class="main">
+      
+
+<section id="single">
+    <h1 class="title">Environment Mapping</h1>
+
+    <div class="tip">
+        <span>
+          Oct 5, 2020 03:29
+        </span>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          
+            2677 words
+          
+        </span>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          6 minute read
+        </span>
     </div>
-    <div class="menu_icon">
-        <a id="menu_icon"><i class="ri-menu-line"></i></a>
-    </div>
-</div>
-        <div class="header animated fadeInDown">
-    <div class="site_title_container">
-        <div class="site_title">
-            <h1>
-                <a href="https://hirokisakuma.com/">
-                    <span></span>
-                </a>
-            </h1>
-        </div>
-        <div class="description">
-            <p class="sub_title">Hiroki Sakuma</p>
-            <div class="my_socials">
-                
-                
-                
-                
-                <a href="https://github.com/skmhrk1209" title="github" target="_blank"><i class="ri-github-fill"></i></a>
-                
-                
-                
-                
-                
-                
-                
-                
-                <a href="https://hirokisakuma.com/index.xml" type="application/rss+xml" title="rss" target="_blank"><i
-                        class="ri-rss-fill"></i></a>
-            </div>
-        </div>
-    </div>
-</div>
-        <div class="content">
-            <div class="post_page">
-                <div class="post animate__animated animate__fadeInDown">
-                    <div class="post_title post_detail_title">
-                        <h2><a href='/posts/environment-mapping/'>Environment Mapping</a></h2>
-                        <span class="date">2020.10.05</span>
-                    </div>
-                    <div class="post_content markdown"><p>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した．
+
+    <div class="content">
+      <p>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した．
 今回は環境マッピングの原理を理解し，GLSLコードに落とし込み，実際にレンダリングすることを目標にする．
 環境マッピング自体は有名な手法で，周囲の環境を金属やガラスのように映し出すオブジェクトをレンダリングできる．
 あくまで擬似的な映り込みであるが，レイトレーシングみたいな計算量は必要ない．
-以下は今回使用した<a href="https://libcinder.org/">Cinder</a>というライブラリに入っている環境マッピングのサンプルである．
+以下は今回使用した<a 
+    href="https://libcinder.org/"
+    
+    
+     
+      target="_blank" 
+      rel="noopener"
+    
+>
+    Cinder
+</a>というライブラリに入っている環境マッピングのサンプルである．
 まぁこんな感じのことをやりたいわけである．
-ちなみにCinderはOpenGLをモダンに抽象化したようなC++ライブラリである．似たようなものに<a href="https://openframeworks.cc/">openFrameworks</a>があるが，Cinderの方がよりOpenGL内部に踏み込まないといけない．C++自体もCinderの方が今っぽい書き方ができる．</p>
+ちなみにCinderはOpenGLをモダンに抽象化したようなC++ライブラリである．似たようなものに<a 
+    href="https://openframeworks.cc/"
+    
+    
+     
+      target="_blank" 
+      rel="noopener"
+    
+>
+    openFrameworks
+</a>があるが，Cinderの方がよりOpenGL内部に踏み込まないといけない．C++自体もCinderの方が今っぽい書き方ができる．</p>
 <br>
 <div align="center">
-<img src="screenshot_cinder.png" width="800">
+<img src="screenshot_cinder.png" width="700">
 </div>
 <br>
 <p>今回は環境マッピングのうちキューブマッピングというものを勉強した．
@@ -125,57 +127,55 @@
 この場合，オブジェクトの位置によらず，反射光の方向のみによってサンプリングされるテクスチャが決定する（鏡面反射）．</p>
 <br>
 <div align="center">
-<img src="cube_mapping.svg" width="400">
+<img src="cube_mapping.svg" width="500">
 </div>
 <br>
 <p>GLSLにはこのような反射方向からキューブマップテクスチャをサンプリングするための<code>samplerCube</code>なる型が存在する．
 よってバーテックスシェーダとフラグメントシェーダは以下のように書ける．</p>
-<p>cube_map.vert</p>
-<div class="highlight"><pre class="chroma"><code class="language-cpp:cube_map_vert.cpp" data-lang="cpp:cube_map_vert.cpp"><span class="cp">#version 150
-</span><span class="cp"></span>
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciModel</span><span class="p">;</span>
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciModelView</span><span class="p">;</span>
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciModelViewProjection</span><span class="p">;</span>
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciViewMatrix</span><span class="p">;</span>
-<span class="n">uniform</span> <span class="n">mat4</span> <span class="n">ciViewMatrixInverse</span><span class="p">;</span>
-<span class="n">uniform</span> <span class="n">mat3</span> <span class="n">ciNormalMatrix</span><span class="p">;</span> <span class="c1">// = transpose(inverse(mat3(ciModelView)))
-</span><span class="c1"></span>
-<span class="n">in</span> <span class="n">vec4</span>	<span class="n">ciPosition</span><span class="p">;</span>
-<span class="n">in</span> <span class="n">vec3</span>	<span class="n">ciNormal</span><span class="p">;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp:cube_map_vert.cpp" data-lang="cpp:cube_map_vert.cpp"><span style="color:#75715e">#version 150
+</span><span style="color:#75715e"></span>
+uniform mat4 ciModel;
+uniform mat4 ciModelView;
+uniform mat4 ciModelViewProjection;
+uniform mat4 ciViewMatrix;
+uniform mat4 ciViewMatrixInverse;
+uniform mat3 ciNormalMatrix; <span style="color:#75715e">// = transpose(inverse(mat3(ciModelView)))
+</span><span style="color:#75715e"></span>
+in vec4	ciPosition;
+in vec3	ciNormal;
 
-<span class="n">out</span> <span class="n">highp</span> <span class="n">vec3</span> <span class="n">eyeDirectionWorld</span><span class="p">;</span>
-<span class="n">out</span> <span class="n">highp</span> <span class="n">vec3</span> <span class="n">normalWorld</span><span class="p">;</span>
+out highp vec3 eyeDirectionWorld;
+out highp vec3 normalWorld;
 
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">gl_Position</span> <span class="o">=</span> <span class="n">ciModelViewProjection</span> <span class="o">*</span> <span class="n">ciPosition</span><span class="p">;</span>
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>()
+{
+    gl_Position <span style="color:#f92672">=</span> ciModelViewProjection <span style="color:#f92672">*</span> ciPosition;
     
-    <span class="n">vec4</span> <span class="n">positionView</span> <span class="o">=</span> <span class="n">ciModelView</span> <span class="o">*</span> <span class="n">ciPosition</span><span class="p">;</span>
-    <span class="n">vec4</span> <span class="n">eyeDirectionView</span> <span class="o">=</span> <span class="n">positionView</span> <span class="o">-</span> <span class="n">vec4</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// eye is always at 0,0,0 in view space
-</span><span class="c1"></span>    <span class="n">eyeDirectionWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">ciViewMatrixInverse</span> <span class="o">*</span> <span class="n">eyeDirectionView</span><span class="p">));</span>
+    vec4 positionView <span style="color:#f92672">=</span> ciModelView <span style="color:#f92672">*</span> ciPosition;
+    vec4 eyeDirectionView <span style="color:#f92672">=</span> positionView <span style="color:#f92672">-</span> vec4(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>); <span style="color:#75715e">// eye is always at 0,0,0 in view space
+</span><span style="color:#75715e"></span>    eyeDirectionWorld <span style="color:#f92672">=</span> normalize(vec3(ciViewMatrixInverse <span style="color:#f92672">*</span> eyeDirectionView));
     
-    <span class="n">vec3</span> <span class="n">normalView</span> <span class="o">=</span> <span class="n">ciNormalMatrix</span> <span class="o">*</span> <span class="n">ciNormal</span><span class="p">;</span>
-    <span class="n">normalWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">vec4</span><span class="p">(</span><span class="n">normalView</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">ciViewMatrix</span><span class="p">));</span>
-    <span class="c1">// normalWorld = normalize(transpose(inverse(mat3(ciModel))) * ciNormal);
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>cube_map.flag</p>
-<div class="highlight"><pre class="chroma"><code class="language-cpp:cube_map_flag.cpp" data-lang="cpp:cube_map_flag.cpp"><span class="cp">#version 150
-</span><span class="cp"></span>
-<span class="n">uniform</span> <span class="n">samplerCube</span> <span class="n">samplerCubeMap</span><span class="p">;</span>
-<span class="n">in</span> <span class="n">vec3</span> <span class="n">eyeDirectionWorld</span><span class="p">;</span>
-<span class="n">in</span> <span class="n">vec3</span> <span class="n">normalWorld</span><span class="p">;</span>
-<span class="n">out</span> <span class="n">vec4</span> <span class="n">flagColor</span><span class="p">;</span>
+    vec3 normalView <span style="color:#f92672">=</span> ciNormalMatrix <span style="color:#f92672">*</span> ciNormal;
+    normalWorld <span style="color:#f92672">=</span> normalize(vec3(vec4(normalView, <span style="color:#ae81ff">0</span>) <span style="color:#f92672">*</span> ciViewMatrix));
+    <span style="color:#75715e">// normalWorld = normalize(transpose(inverse(mat3(ciModel))) * ciNormal);
+</span><span style="color:#75715e"></span>}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp:cube_map_flag.cpp" data-lang="cpp:cube_map_flag.cpp"><span style="color:#75715e">#version 150
+</span><span style="color:#75715e"></span>
+uniform samplerCube samplerCubeMap;
+in vec3 eyeDirectionWorld;
+in vec3 normalWorld;
+out vec4 flagColor;
 
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">vec3</span> <span class="n">reflectionDirection</span> <span class="o">=</span> <span class="n">reflect</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">);</span>
-    <span class="n">flagColor</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">samplerCubeMap</span><span class="p">,</span> <span class="n">reflectionDirection</span><span class="p">);</span>
-<span class="p">}</span>
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>()
+{
+    vec3 reflectionDirection <span style="color:#f92672">=</span> reflect(eyeDirectionWorld, normalWorld);
+    flagColor <span style="color:#f92672">=</span> texture(samplerCubeMap, reflectionDirection);
+}
 </code></pre></div><p>ここでフラグメントシェーダはバーテックスシェーダから渡された視線方向と法線から，ビルトイン関数<code>reflect</code>によって，反射方向を計算し，キューブマップテクスチャをサンプリングしている．
 問題はバーテックスシェーダである．
 GLSLに慣れていないので，法線の世界座標をどうやって取っているのか，Cinderのサンプルを見てみたら以下のように書いてあった．</p>
-<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">vec3</span> <span class="n">normalView</span> <span class="o">=</span> <span class="n">ciNormalMatrix</span> <span class="o">*</span> <span class="n">ciNormal</span><span class="p">;</span>
-<span class="n">normalWorld</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">vec3</span><span class="p">(</span><span class="n">vec4</span><span class="p">(</span><span class="n">normalView</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">ciViewMatrix</span><span class="p">));</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">vec3 normalView <span style="color:#f92672">=</span> ciNormalMatrix <span style="color:#f92672">*</span> ciNormal;
+normalWorld <span style="color:#f92672">=</span> normalize(vec3(vec4(normalView, <span style="color:#ae81ff">0</span>) <span style="color:#f92672">*</span> ciViewMatrix));
 </code></pre></div><p>まず，ビュー座標系に変換するのに，<code>ciNormalMatrix</code>なるuniform型変数が使われている．
 そもそもこの<code>ciNormalMatrix</code>の意味がわからなかった．<code>ciModelView</code>じゃダメなのかと．</p>
 <p>そこで頂点$p$がある変換行列$T$によって$p'$に移るとき，$p$における法線$n$を$p'$における法線$n'$に移すような変換行列$U$は何かを考える．
@@ -191,9 +191,9 @@ $T^{T}U=E$のとき$m'^{T}n'=m^{T}n=0$となるので，$U=(T^{T})^{-1}=(T^{-1})
 <p><code>normalWorld = normalize(vec3(vec4(normalView, 0) * ciViewMatrix));</code>の意味はなんだろう．
 頂点を世界座標系からビュー座標系に移すのが<code>ciViewMatrix</code>なので，法線を世界座標系からビュー座標系に移すのは<code>transpose(inverse(mat3(ciViewMatrix)))</code>である．
 今ビュー座標系における法線<code>normalView</code>が手に入っているので，世界座標系に戻すためにさらに<code>inverse</code>したものを左からかけて，</p>
-<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="n">inverse</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">inverse</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">ciViewMatrix</span><span class="p">))))</span> <span class="o">*</span> <span class="n">normalView</span> 
-<span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">mat3</span><span class="p">(</span><span class="n">ciViewMatrix</span><span class="p">))</span> <span class="o">*</span> <span class="n">normalView</span> 
-<span class="o">=</span> <span class="n">normalView</span> <span class="o">*</span> <span class="n">mat3</span><span class="p">(</span><span class="n">ciViewMatrix</span><span class="p">)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">inverse(transpose(inverse(mat3(ciViewMatrix)))) <span style="color:#f92672">*</span> normalView 
+<span style="color:#f92672">=</span> transpose(mat3(ciViewMatrix)) <span style="color:#f92672">*</span> normalView 
+<span style="color:#f92672">=</span> normalView <span style="color:#f92672">*</span> mat3(ciViewMatrix)
 </code></pre></div><p>としているんだと思う．
 これは1つのやり方で，他にも<code>normalWorld = normalize(transpose(inverse(mat3(ciModel))) * ciNormal);</code>とかでもいいと思う．</p>
 <p>今回キューブマップ用のテクスチャとして以下のような画像を用意した．</p>
@@ -205,159 +205,187 @@ $T^{T}U=E$のとき$m'^{T}n'=m^{T}n=0$となるので，$U=(T^{T})^{-1}=(T^{-1})
 <p>これで周囲の環境を完全鏡面反射するオブジェクトは以下のようにレンダリングできる．</p>
 <br>
 <div align="center">
-<img src="screenshot_object.png" width="800">
+<img src="screenshot_object.png" width="700">
 </div>
 <br>
 <p>次に肝心の環境そのものをレンダリングしなくてはならない．
 これはもっと単純でオブジェクトの頂点方向をサンプリングすれば良い．</p>
 <br>
 <div align="center">
-<img src="sky_box.svg" width="400">
+<img src="sky_box.svg" width="500">
 </div>
 <br>
 <p>これで以下のようにレンダリングできる．</p>
 <br>
 <div align="center">
-<img src="screenshot_cube_mapping.png" width="800">
+<img src="screenshot_cube_mapping.png" width="700">
 </div>
 <br>
 <p>最後に，今までは反射光のみをレンダリングしてきた．これをそれに加えて屈折光もレンダリングすることを考える．
 ただし簡単のため，2度目以降の屈折は考えない．
 屈折光はGLSLのビルトイン関数<code>refract</code>で計算できる．<code>reflect</code>との違いは屈折率の比を与えてやるということである．
-また反射光と屈折光の割合は<a href="https://en.wikipedia.org/wiki/Fresnel_equations">フレネル反射率</a>で計算できる．
-今回は大気の屈折率$n_{1} \fallingdotseq 1.0$，ガラスの屈折率$n_{2} \fallingdotseq 1.5$を用い，<a href="https://en.wikipedia.org/wiki/Schlick%27s_approximation">Schlickの近似式</a>により計算した．</p>
-<p>フラグメントシェーダは以下のようになる．</p>
-<div class="highlight"><pre class="chroma"><code class="language-cpp:cube_mapping_frag.cpp" data-lang="cpp:cube_mapping_frag.cpp"><span class="cp">#version 150
-</span><span class="cp"></span>
-<span class="n">uniform</span> <span class="n">samplerCube</span> <span class="n">samplerCubeMap</span><span class="p">;</span>
-<span class="n">in</span> <span class="n">vec3</span> <span class="n">eyeDirectionWorld</span><span class="p">;</span>
-<span class="n">in</span> <span class="n">vec3</span> <span class="n">normalWorld</span><span class="p">;</span>
-<span class="n">out</span> <span class="n">vec4</span> <span class="n">flagColor</span><span class="p">;</span>
-
-<span class="n">uniform</span> <span class="kt">float</span> <span class="n">refractiveIndex</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">1.5</span><span class="p">;</span>
-
-<span class="kt">float</span> <span class="nf">fresnelReflectance</span><span class="p">(</span><span class="n">vec3</span> <span class="n">light</span><span class="p">,</span> <span class="n">vec3</span> <span class="n">normal</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">float</span> <span class="n">specularReflectance</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">refractiveIndex</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">refractiveIndex</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">specularReflectance</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">specularReflectance</span><span class="p">)</span> <span class="o">*</span> <span class="n">pow</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dot</span><span class="p">(</span><span class="o">-</span><span class="n">light</span><span class="p">,</span> <span class="n">normal</span><span class="p">),</span> <span class="mf">5.0</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// refract the eye ray upong entering the surface (we&#39;re ignoring the second refraction when the ray exits the object).
-</span><span class="c1"></span>    <span class="n">vec3</span> <span class="n">refractionDirection</span> <span class="o">=</span> <span class="n">refract</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">,</span> <span class="n">refractiveIndex</span><span class="p">);</span>
-    <span class="c1">// reflect the eye ray about the surface normal (all in world space)
-</span><span class="c1"></span>    <span class="n">vec3</span> <span class="n">reflectionDirection</span> <span class="o">=</span> <span class="n">reflect</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">);</span>
-
-    <span class="n">vec4</span> <span class="n">flagColorRefracted</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">samplerCubeMap</span><span class="p">,</span> <span class="n">refractionDirection</span><span class="p">);</span>
-    <span class="n">vec4</span> <span class="n">flagColorReflected</span> <span class="o">=</span> <span class="n">texture</span><span class="p">(</span><span class="n">samplerCubeMap</span><span class="p">,</span> <span class="n">reflectionDirection</span><span class="p">);</span>
+また反射光と屈折光の割合は<a 
+    href="https://en.wikipedia.org/wiki/Fresnel_equations"
     
-    <span class="n">flagColor</span> <span class="o">=</span> <span class="n">mix</span><span class="p">(</span><span class="n">flagColorRefracted</span><span class="p">,</span> <span class="n">flagColorReflected</span><span class="p">,</span> <span class="n">fresnelReflectance</span><span class="p">(</span><span class="n">eyeDirectionWorld</span><span class="p">,</span> <span class="n">normalWorld</span><span class="p">));</span>
-<span class="p">}</span>
+    
+     
+      target="_blank" 
+      rel="noopener"
+    
+>
+    フレネル反射率
+</a>で計算できる．
+今回は大気の屈折率$n_{1} \fallingdotseq 1.0$，ガラスの屈折率$n_{2} \fallingdotseq 1.5$を用い，<a 
+    href="https://en.wikipedia.org/wiki/Schlick%27s_approximation"
+    
+    
+     
+      target="_blank" 
+      rel="noopener"
+    
+>
+    Schlickの近似式
+</a>により計算した．</p>
+<p>フラグメントシェーダは以下のようになる．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp:cube_mapping_frag.cpp" data-lang="cpp:cube_mapping_frag.cpp"><span style="color:#75715e">#version 150
+</span><span style="color:#75715e"></span>
+uniform samplerCube samplerCubeMap;
+in vec3 eyeDirectionWorld;
+in vec3 normalWorld;
+out vec4 flagColor;
+
+uniform <span style="color:#66d9ef">float</span> refractiveIndex <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">1.5</span>;
+
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">fresnelReflectance</span>(vec3 light, vec3 normal)
+{
+    <span style="color:#66d9ef">float</span> specularReflectance <span style="color:#f92672">=</span> pow(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> refractiveIndex, <span style="color:#ae81ff">2.0</span>) <span style="color:#f92672">/</span> pow(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> refractiveIndex, <span style="color:#ae81ff">2.0</span>);
+    <span style="color:#66d9ef">return</span> specularReflectance <span style="color:#f92672">+</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> specularReflectance) <span style="color:#f92672">*</span> pow(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> dot(<span style="color:#f92672">-</span>light, normal), <span style="color:#ae81ff">5.0</span>);
+}
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>()
+{
+    <span style="color:#75715e">// refract the eye ray upong entering the surface (we&#39;re ignoring the second refraction when the ray exits the object).
+</span><span style="color:#75715e"></span>    vec3 refractionDirection <span style="color:#f92672">=</span> refract(eyeDirectionWorld, normalWorld, refractiveIndex);
+    <span style="color:#75715e">// reflect the eye ray about the surface normal (all in world space)
+</span><span style="color:#75715e"></span>    vec3 reflectionDirection <span style="color:#f92672">=</span> reflect(eyeDirectionWorld, normalWorld);
+
+    vec4 flagColorRefracted <span style="color:#f92672">=</span> texture(samplerCubeMap, refractionDirection);
+    vec4 flagColorReflected <span style="color:#f92672">=</span> texture(samplerCubeMap, reflectionDirection);
+    
+    flagColor <span style="color:#f92672">=</span> mix(flagColorRefracted, flagColorReflected, fresnelReflectance(eyeDirectionWorld, normalWorld));
+}
 </code></pre></div><p>屈折を考慮することで，背景がガラスのように透けて見えるようになった．</p>
 <br>
 <div align="center">
-<img src="screenshot_reflection.png" width="800">
+<img src="screenshot_reflection.png" width="700">
 <p><span>Reflection mapping</span></p>
-<img src="screenshot_reflaction.png" width="800">
+<img src="screenshot_reflaction.png" width="700">
 <p><span>Refraction mapping</span></p>
 </div>
 <br>
 <p>今後もいろいろなレンダリング手法を少しずつGLSLを通して勉強していきたい．</p>
-</div>
-                    <div class="post_footer">
-                        
-                        <div class="meta">
-                            <div class="info">
-                                <span class="field tags">
-                                    <i class="ri-stack-line"></i>
-                                    
-                                    <a href="https://hirokisakuma.com/tags/computer-graphics/">computer graphics</a>
-                                    
-                                    <a href="https://hirokisakuma.com/tags/cinder/">cinder</a>
-                                    
-                                    <a href="https://hirokisakuma.com/tags/glsl/">glsl</a>
-                                    
-                                </span>
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-                
-                
-                <div class="doc_comments"></div>
-                
-            </div>
+
+    </div>
+
+    
+        <div class="tags">
+            
+                <a href="https://hirokisakuma.com/tags/computer-graphics">computer graphics</a>
+            
+                <a href="https://hirokisakuma.com/tags/cinder">cinder</a>
+            
+                <a href="https://hirokisakuma.com/tags/glsl">glsl</a>
+            
         </div>
-    </div>
-    <a id="back_to_top" href="#" class="back_to_top"><i class="ri-arrow-up-s-line"></i></a>
-    <footer class="footer">
-    <div class="powered_by">
-        <a href="https://varkai.com">Designed by VarKai,</a>
-        <a href="http://www.gohugo.io/">Proudly published with Hugo</a>
-    </div>
-
-    <div class="footer_slogan">
-        <span>¯\_(ツ)_/¯</span>
-    </div>
-</footer>
-    <script src="https://hirokisakuma.com/js/jquery-3.5.1.min.js"></script>
-<link href="https://hirokisakuma.com/css/fancybox.min.css" rel="stylesheet">
-<script src="https://hirokisakuma.com/js/fancybox.min.js"></script>
-<script src="https://hirokisakuma.com/js/zozo.js"></script>
-
-
-<script type="text/javascript" async
-    src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-        MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\[\[', '\]\]']],
-                processEscapes: true,
-                processEnvironments: true,
-                skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-                TeX: {
-                    equationNumbers: { autoNumber: "AMS" },
-                    extensions: ["AMSmath.js", "AMSsymbols.js"]
-                }
-            }
-        });
-
-        MathJax.Hub.Queue(function () {
-            
-            
-            
-            var all = MathJax.Hub.getAllJax(), i;
-            for (i = 0; i < all.length; i += 1) {
-                all[i].SourceElement().parentNode.className += ' has-jax';
-            }
-        });
-    </script>
-
-<style>
-    code.has-jax {
-        font: inherit;
-        font-size: 100%;
-        background: inherit;
-        border: inherit;
-        color: #515151;
-    }
-</style>
-
-
-
+    
+    
+     
+  <div id="comment">
+    
+    <div id="disqus_thread"></div>
 <script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-179623902-1', 'auto');
-	
-	ga('send', 'pageview');
-}
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "https-hirokisakuma-com" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
 </script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
 
-</body>
 
+</section>
+
+
+    </main>
+    
+    <footer id="footer">
+    
+        <div id="social">
+
+
+    <a class="symbol" href="https://github.com/skmhrk1209" target="_blank">
+        
+        <svg fill="#bbbbbb" width="28" height="28"  viewBox="0 0 72 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    
+    <title>Github</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Social-Icons---Rounded-Black" transform="translate(-264.000000, -939.000000)">
+            <g id="Github" transform="translate(264.000000, 939.000000)">
+                <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" id="Rounded" fill="#bbbbbb"></path>
+                <path d="M35.9985,13 C22.746,13 12,23.7870921 12,37.096644 C12,47.7406712 18.876,56.7718301 28.4145,59.9584121 C29.6145,60.1797862 30.0525,59.4358488 30.0525,58.7973276 C30.0525,58.2250681 30.0315,56.7100863 30.0195,54.6996482 C23.343,56.1558981 21.9345,51.4693938 21.9345,51.4693938 C20.844,48.6864054 19.2705,47.9454799 19.2705,47.9454799 C17.091,46.4500754 19.4355,46.4801943 19.4355,46.4801943 C21.843,46.6503662 23.1105,48.9634994 23.1105,48.9634994 C25.2525,52.6455377 28.728,51.5823398 30.096,50.9649018 C30.3135,49.4077535 30.9345,48.3460615 31.62,47.7436831 C26.2905,47.1352808 20.688,45.0691228 20.688,35.8361671 C20.688,33.2052792 21.6225,31.0547881 23.1585,29.3696344 C22.911,28.7597262 22.0875,26.3110578 23.3925,22.9934585 C23.3925,22.9934585 25.4085,22.3459017 29.9925,25.4632101 C31.908,24.9285993 33.96,24.6620468 36.0015,24.6515052 C38.04,24.6620468 40.0935,24.9285993 42.0105,25.4632101 C46.5915,22.3459017 48.603,22.9934585 48.603,22.9934585 C49.9125,26.3110578 49.089,28.7597262 48.8415,29.3696344 C50.3805,31.0547881 51.309,33.2052792 51.309,35.8361671 C51.309,45.0917119 45.6975,47.1292571 40.3515,47.7256117 C41.2125,48.4695491 41.9805,49.9393525 41.9805,52.1877301 C41.9805,55.4089489 41.9505,58.0067059 41.9505,58.7973276 C41.9505,59.4418726 42.3825,60.1918338 43.6005,59.9554002 C53.13,56.7627944 60,47.7376593 60,37.096644 C60,23.7870921 49.254,13 35.9985,13" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    </a>
+
+
+</div>
+
+    
+
+    <p class="copyright">
+    
+       © Copyright 
+       2021 
+       <span class="split">
+        <svg fill="#bbbbbb" width="15" height="15" version="1.1" id="heart-15" xmlns="http://www.w3.org/2000/svg" width="15px" height="15px" viewBox="0 0 15 15">
+  <path d="M13.91,6.75c-1.17,2.25-4.3,5.31-6.07,6.94c-0.1903,0.1718-0.4797,0.1718-0.67,0C5.39,12.06,2.26,9,1.09,6.75&#xA;&#x9;C-1.48,1.8,5-1.5,7.5,3.45C10-1.5,16.48,1.8,13.91,6.75z"/>
+</svg>
+       </span>
+       Hiroki Sakuma
+    
+    </p>
+    <p class="powerby">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+    processEscapes: true
+    }
+});
+</script>
+<script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  </body>
 </html>

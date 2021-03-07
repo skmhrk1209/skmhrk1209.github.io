@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>glsl on </title>
+    <title>glsl on Hiroki Sakuma</title>
     <link>https://hirokisakuma.com/tags/glsl/</link>
-    <description>Recent content in glsl on </description>
+    <description>Recent content in glsl on Hiroki Sakuma</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>ja</language>
+    <language>en-us</language>
     <lastBuildDate>Sun, 25 Oct 2020 20:25:53 +0900</lastBuildDate><atom:link href="https://hirokisakuma.com/tags/glsl/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Distance Estimators for 3D Fractals</title>
-      <link>https://hirokisakuma.com/posts/distance_estimators/</link>
+      <link>https://hirokisakuma.com/posts/distance-estimators-for-3d-fractals/</link>
       <pubDate>Sun, 25 Oct 2020 20:25:53 +0900</pubDate>
       
-      <guid>https://hirokisakuma.com/posts/distance_estimators/</guid>
-      <description>先日のポストでは DVR [Niemeyer et al., CVPR&#39;20] を参考にDNNでSigned Distance Function (SDF)をモデル化し，学習させてみた． forwardではスフィアトレーシングによるレンダリングを行い，backwardではオブジェクトとの交</description>
+      <guid>https://hirokisakuma.com/posts/distance-estimators-for-3d-fractals/</guid>
+      <description>先日のポストでは DVR [Niemeyer et al., CVPR&#39;20] を参考にDNNでSigned Distance Function (SDF)をモデル化し，学習させてみた． forwardではスフィアトレーシングによ</description>
     </item>
     
     <item>
@@ -22,7 +22,7 @@
       <pubDate>Mon, 05 Oct 2020 03:29:07 +0900</pubDate>
       
       <guid>https://hirokisakuma.com/posts/environment-mapping/</guid>
-      <description>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した． 今回は環境マッピングの原理を理解し，GLSLコードに落とし込み</description>
+      <description>前回のポストで紹介したAvalon EmersonのMVで環境マッピングなるものがおそらく使われていて，原理を知りたいと思い，少し勉強した． 今</description>
     </item>
     
   </channel>

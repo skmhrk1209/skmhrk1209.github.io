@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>neural network on </title>
+    <title>neural network on Hiroki Sakuma</title>
     <link>https://hirokisakuma.com/tags/neural-network/</link>
-    <description>Recent content in neural network on </description>
+    <description>Recent content in neural network on Hiroki Sakuma</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>ja</language>
+    <language>en-us</language>
     <lastBuildDate>Fri, 09 Oct 2020 03:00:28 +0900</lastBuildDate><atom:link href="https://hirokisakuma.com/tags/neural-network/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Differentiable Sphere Tracing</title>
@@ -13,7 +13,7 @@
       <pubDate>Fri, 09 Oct 2020 03:00:28 +0900</pubDate>
       
       <guid>https://hirokisakuma.com/posts/differentiable-sphere-tracing/</guid>
-      <description>CVPR&#39;20の論文を眺めていたら，最近ハマっているGLSLと関連する面白そうな論文を見つけた． Differentiable Volumetric Rendering: Learning Implicit 3D Representations without 3D Supervision [Niemeyer et al., CVPR&#39;20] DIST: Rendering Deep Implicit Signed Distance Function with Differentiable Sphere Tracing [Liu et al., CVPR&#39;20] SDFDiff: Differentiable Rendering of Signed Distance Fields for 3D Shape Optimization [Jiang et al., CVPR&#39;20] ここ最近のCVP</description>
+      <description>CVPR&#39;20の論文を眺めていたら，最近ハマっているGLSLと関連する面白そうな論文を見つけた． Differentiable Volumetric Rendering: Learning Implicit 3D Representations without 3D Supervision [Niemeyer et al., CVPR&#39;20] DIST: Rendering Deep Implicit Signed Distance Function with</description>
     </item>
     
   </channel>
