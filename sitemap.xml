@@ -3,6 +3,21 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://hirokisakuma.com/</loc>
+    <lastmod>2021-03-09T00:55:46+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/posts/</loc>
+    <lastmod>2021-03-09T00:55:46+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://hirokisakuma.com/posts/unknown-pleasures/</loc>
+    <lastmod>2021-03-09T00:55:46+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
@@ -19,16 +34,6 @@
   
   <url>
     <loc>https://hirokisakuma.com/tags/glsl/</loc>
-    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/</loc>
-    <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://hirokisakuma.com/posts/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
   </url>
   
