@@ -70,19 +70,25 @@ if (!doNotTrack) {
         </span>
         <span>
           
-            4588 words
+            5145 words
           
         </span>
         <span class="split">
           ·
         </span>
         <span>
-          10 minute read
+          11 minute read
         </span>
     </div>
 
     <div class="content">
-      <p>先日のポストでは <a 
+      <br>
+<div align="center">
+<img src="julia3d_1.png" width="330">
+<img src="mandelbrot3d_2.png" width="330">
+</div>
+<br>
+<p>先日のポストでは <a 
     href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeyer_Differentiable_Volumetric_Rendering_Learning_Implicit_3D_Representations_Without_3D_Supervision_CVPR_2020_paper.pdf"
     
     
@@ -175,7 +181,7 @@ $$(\alpha\gamma-\beta)+(\alpha+\beta\gamma)i+(\gamma^{2}+1)j=0$$
 <p>ここで，${f_{c}^{n}}'(z)$はどうやって求めるのだろう．
 考えられるのは数値微分か自動微分．今回は双対数（Dual Number）を用いたフォワード型の自動微分を行った．
 今回微分したい$f_{c}(z)$は入力，出力ともにクォータニオンなので，クォータニオンの双対数（Dual Quaternion）を考えることになり，結構ややこしそうだ．</p>
-<p>まずはクォータニオン用の演算を定義しておく．</p>
+<p>まずはクォータニオン用の演算を定義しておく．以降のソースは全てGLSLフラグメントシェーダ．</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// ---------------- quaternion ---------------- //
 </span><span style="color:#75715e"></span>
 vec4 <span style="color:#a6e22e">qAdd</span>(vec4 q1, vec4 q2)
@@ -200,9 +206,15 @@ vec4 <span style="color:#a6e22e">qConj</span>(vec4 q)
     <span style="color:#66d9ef">return</span> vec4(q.x, <span style="color:#f92672">-</span>q.yzw);
 }
 
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">qNorm</span>(vec4 q)
+{
+    <span style="color:#75715e">// return sqrt(qMul(q, qConj(q)).x);
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> length(q);
+}
+
 vec4 <span style="color:#a6e22e">qInv</span>(vec4 q)
 {
-    <span style="color:#66d9ef">return</span> qConj(q) <span style="color:#f92672">/</span> pow(length(q),<span style="color:#ae81ff">2</span>);
+    <span style="color:#66d9ef">return</span> qConj(q) <span style="color:#f92672">/</span> pow(qNorm(q),<span style="color:#ae81ff">2</span>);
 }
 
 vec4 <span style="color:#a6e22e">qDiv</span>(vec4 q1, vec4 q2)
@@ -223,40 +235,40 @@ vec4 <span style="color:#a6e22e">qPow</span>(vec4 q, <span style="color:#66d9ef"
 演算子のオーバーロードができないのが辛い．</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// ---------------- dual ---------------- //
 </span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">QDual</span>
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">DualQ</span>
 {
     vec4 q;
     vec4 d;
 };
 
-QDual <span style="color:#a6e22e">qdAdd</span>(QDual qd1, QDual qd2)
+DualQ <span style="color:#a6e22e">dqAdd</span>(DualQ dq1, DualQ dq2)
 {
-    <span style="color:#66d9ef">return</span> QDual(qAdd(qd1.q, qd2.q), qAdd(qd1.d, qd2.d));
+    <span style="color:#66d9ef">return</span> DualQ(qAdd(dq1.q, dq2.q), qAdd(dq1.d, dq2.d));
 }
 
-QDual <span style="color:#a6e22e">qdSub</span>(QDual qd1, QDual qd2)
+DualQ <span style="color:#a6e22e">dqSub</span>(DualQ dq1, DualQ dq2)
 {
-    <span style="color:#66d9ef">return</span> QDual(qSub(qd1.q, qd2.q), qSub(qd1.d, qd2.d));
+    <span style="color:#66d9ef">return</span> DualQ(qSub(dq1.q, dq2.q), qSub(dq1.d, dq2.d));
 }
 
-QDual <span style="color:#a6e22e">qdMul</span>(QDual qd1, QDual qd2)
+DualQ <span style="color:#a6e22e">dqMul</span>(DualQ dq1, DualQ dq2)
 {
-    <span style="color:#66d9ef">return</span> QDual(qMul(qd1.q, qd2.q), qAdd(qMul(qd1.d, qd2.q), qMul(qd1.q, qd2.d)));
+    <span style="color:#66d9ef">return</span> DualQ(qMul(dq1.q, dq2.q), qAdd(qMul(dq1.d, dq2.q), qMul(dq1.q, dq2.d)));
 }
 
-QDual <span style="color:#a6e22e">qdDiv</span>(QDual qd1, QDual qd2)
+DualQ <span style="color:#a6e22e">dqDiv</span>(DualQ dq1, DualQ dq2)
 {
-    <span style="color:#66d9ef">return</span> QDual(qDiv(qd1.q, qd2.q), qDiv(qSub(qMul(qd1.d, qd2.q), qMul(qd1.q, qd2.d)), qMul(qd2.q, qd2.q)));
+    <span style="color:#66d9ef">return</span> DualQ(qDiv(dq1.q, dq2.q), qDiv(qSub(qMul(dq1.d, dq2.q), qMul(dq1.q, dq2.d)), qMul(dq2.q, dq2.q)));
 }
 
-QDual <span style="color:#a6e22e">qdPow</span>(QDual qd, <span style="color:#66d9ef">int</span> n)
+DualQ <span style="color:#a6e22e">dqPow</span>(DualQ dq, <span style="color:#66d9ef">int</span> n)
 {
-    QDual p <span style="color:#f92672">=</span> QDual(vec4(<span style="color:#ae81ff">1.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)), vec4(<span style="color:#ae81ff">0.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)));
+    DualQ dp <span style="color:#f92672">=</span> DualQ(vec4(<span style="color:#ae81ff">1.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)), vec4(<span style="color:#ae81ff">0.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)));
     <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n; <span style="color:#f92672">++</span>i)
     {
-        p <span style="color:#f92672">=</span> qdMul(p, qd);
+        dp <span style="color:#f92672">=</span> dqMul(dp, dq);
     }
-    <span style="color:#66d9ef">return</span> p;
+    <span style="color:#66d9ef">return</span> dp;
 }
 </code></pre></div><p>一旦ここら辺を丁寧に実装すれば，低レベルのややこしい演算は抽象化できる．
 双対数上で定義された関数$f$に双対数$x+\epsilon$をぶちこむと，$f(x+\epsilon)=f(x)+f'(x)\epsilon$となり，その虚部は常に導関数となっている．
@@ -282,115 +294,231 @@ ${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$がわかれば，距離推定により，�
 距離推定のソースは以下．</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// ---------------- fractals ---------------- //
 </span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfJulia</span>(vec4 z, vec4 c)
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfJulia</span>(vec4 z, vec4 c, <span style="color:#66d9ef">int</span> power, <span style="color:#66d9ef">int</span> numIterations, <span style="color:#66d9ef">float</span> escapeCriteria)
 {
-    QDual zd <span style="color:#f92672">=</span> QDual(z, vec4(<span style="color:#ae81ff">1.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)));
-    QDual cd <span style="color:#f92672">=</span> QDual(c, vec4(<span style="color:#ae81ff">0.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)));
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> juliaIterations; <span style="color:#f92672">++</span>i)
+    DualQ dzx <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcx <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> numIterations; <span style="color:#f92672">++</span>i)
     {
         <span style="color:#75715e">// forward-mode automatic differentiation
-</span><span style="color:#75715e"></span>        zd <span style="color:#f92672">=</span> qdAdd(qdPow(zd, <span style="color:#ae81ff">2</span>), cd);
-        <span style="color:#66d9ef">if</span> (length(zd.q) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2.0</span>) <span style="color:#66d9ef">break</span>;
+</span><span style="color:#75715e"></span>        dzx <span style="color:#f92672">=</span> dqAdd(dqPow(dzx, power), dcx);
+        
+        <span style="color:#66d9ef">if</span> (qNorm(dzx.q) <span style="color:#f92672">&gt;</span> escapeCriteria) <span style="color:#66d9ef">break</span>;
     }
     
-    <span style="color:#66d9ef">return</span> (length(zd.q) <span style="color:#f92672">*</span> log(length(zd.q))) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> length(zd.d));
+    <span style="color:#66d9ef">return</span> (qNorm(dzx.q) <span style="color:#f92672">*</span> log(qNorm(dzx.q))) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> qNorm(dzx.d));
 }
-
-<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfMandelbrot</span>(vec4 c, vec4 z)
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfMandelbrot</span>(vec4 c, vec4 z, <span style="color:#66d9ef">int</span> power, <span style="color:#66d9ef">int</span> numIterations, <span style="color:#66d9ef">float</span> escapeCriteria)
 {
-    QDual zd <span style="color:#f92672">=</span> QDual(z, vec4(<span style="color:#ae81ff">0.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)));
-    QDual cd <span style="color:#f92672">=</span> QDual(c, vec4(<span style="color:#ae81ff">1.0</span>, vec3(<span style="color:#ae81ff">0.0</span>)));
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> mandelbrotIterations; <span style="color:#f92672">++</span>i)
+    DualQ dzx <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcx <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> numIterations; <span style="color:#f92672">++</span>i)
     {
         <span style="color:#75715e">// forward-mode automatic differentiation
-</span><span style="color:#75715e"></span>        zd <span style="color:#f92672">=</span> qdAdd(qdPow(zd, <span style="color:#ae81ff">2</span>), cd);
-        <span style="color:#66d9ef">if</span> (length(zd.q) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2.0</span>) <span style="color:#66d9ef">break</span>;
+</span><span style="color:#75715e"></span>        dzx <span style="color:#f92672">=</span> dqAdd(dqPow(dzx, power), dcx);
+        
+        <span style="color:#66d9ef">if</span> (qNorm(dzx.q) <span style="color:#f92672">&gt;</span> escapeCriteria) <span style="color:#66d9ef">break</span>;
     }
     
-    <span style="color:#66d9ef">return</span> (length(zd.q) <span style="color:#f92672">*</span> log(length(zd.q))) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> length(zd.d));
+    <span style="color:#66d9ef">return</span> (qNorm(dzx.q) <span style="color:#f92672">*</span> log(qNorm(dzx.q))) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> qNorm(dzx.d));
 }
 </code></pre></div><p>あと必要なのは法線である．ポテンシャル$G(z)$または推定距離$d(z)$の微分が計算できれば良さそうだ．
 $$G(z)=\lim_{n \to \infty}\cfrac{1}{2^{n}}log|f_{c}^{n}(z)|$$より，
 $$\nabla G(z)=\cfrac{1}{2^{n}|f_{c}^{n}(z)|}\nabla\sqrt{f_{c}^{n}(z)^{T}f_{c}^{n}(z)}=\cfrac{{f_{c}^{n}}'(z)^{T}f_{c}^{n}(z)}{2^{n}|f_{c}^{n}(z)|^{2}}$$</p>
 <p>これで距離推定と同時に法線も推定できることがわかった．</p>
-<p>ただ法線に関してはヤコビ行列を計算したいので，DualQuaternionの虚部がmat4になる．mat4についてDualQuaternionの演算を定義するのは大変なので，シンプルにchain ruleでヤコビ行列を追跡していった．</p>
+<p>上式より法線に関してはヤコビ行列 ${f_{c}^{n}}'(z)$を計算したいので，DualQuaternionの虚部がmat4になる．mat4についてDualQuaternionの演算を定義するのは大変なので，複数の勾配を同時に追跡するか，以下のようにシンプルにchain ruleでヤコビ行列を追跡しても良さそう．</p>
 <p>$$f_{c}^{n}(z)=(f_{c}^{n-1}(z))^{2}+c$$</p>
 <p>より，</p>
 <p>$${f_{c}^{n}}’(z)=2\begin{pmatrix}f_{c}^{n-1}(z)_{x} &amp; -f_{c}^{n-1}(z)_{y} &amp; -f_{c}^{n-1}(z)_{z} &amp; -f_{c}^{n-1}(z)_{w}\\ f_{c}^{n-1}(z)_{y} &amp; f_{c}^{n-1}(z)_{x} &amp; 0 &amp; 0\\ f_{c}^{n-1}(z)_{z} &amp; 0 &amp; f_{c}^{n-1}(z)_{x} &amp; 0\\ f_{c}^{n-1}(z)_{w} &amp; 0 &amp; 0 &amp; f_{c}^{n-1}(z)_{x}\end{pmatrix}{f_{c}^{n-1}}'(z)$$</p>
 <p>これで$f_{c}^{n}(z)$の計算と同時に${f_{c}^{n}}'(z)$も計算できる．
-最初以下のように普通に計算しようとしたが，クォータニオンの場合にはそもそも計算できなかったので，上式は手で微分して突っ込んだ．</p>
+最初以下のように普通に計算しようとしたが，クォータニオンの場合にはそもそも計算できなかった（?）ので，上式は手で微分して突っ込んだ．</p>
 <p>$${f_{c}^{n}}’(z)=2{f_{c}^{n-1}}(z){f_{c}^{n-1}}'(z)$$</p>
 <p>chain ruleでこんなに簡単に追跡できるなら，双対数を導入する必要性はなかった気もするが，これを機にいろいろ知れたし．これはこれで良かったと思う．
 法線推定のソースは以下．</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// ---------------- fractals ---------------- //
 </span><span style="color:#75715e"></span>
-vec4 <span style="color:#a6e22e">normalJulia</span>(vec4 z, vec4 c)
+vec4 <span style="color:#a6e22e">normalJulia</span>(vec4 z, vec4 c, <span style="color:#66d9ef">int</span> power, <span style="color:#66d9ef">int</span> numIterations, <span style="color:#66d9ef">float</span> escapeCriteria)
 {
-    <span style="color:#75715e">// jacobian
-</span><span style="color:#75715e"></span>    mat4 J <span style="color:#f92672">=</span> mat4(<span style="color:#ae81ff">1.0</span>);
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> juliaIterations; <span style="color:#f92672">++</span>i)
+    DualQ dzx <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dzy <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dzz <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dzw <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>));
+    
+    DualQ dcx <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcy <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcz <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcw <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> numIterations; <span style="color:#f92672">++</span>i)
     {
-        <span style="color:#75715e">// forward-mode manual differentiation
-</span><span style="color:#75715e"></span>        <span style="color:#75715e">// NOTE: glsl uses column-major matrices
-</span><span style="color:#75715e"></span>        J <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> mat4(
-            <span style="color:#f92672">+</span>z.x, z.y, z.z, z.w,
-            <span style="color:#f92672">-</span>z.y, z.x, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>,
-            <span style="color:#f92672">-</span>z.z, <span style="color:#ae81ff">0.0</span>, z.x, <span style="color:#ae81ff">0.0</span>,
-            <span style="color:#f92672">-</span>z.w, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, z.x
-        ) <span style="color:#f92672">*</span> J;
-        z <span style="color:#f92672">=</span> qAdd(qPow(z, <span style="color:#ae81ff">2</span>), c);
-        <span style="color:#66d9ef">if</span> (length(z) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2.0</span>) <span style="color:#66d9ef">break</span>;
+        <span style="color:#75715e">// forward-mode automatic differentiation
+</span><span style="color:#75715e"></span>        dzx <span style="color:#f92672">=</span> dqAdd(dqPow(dzx, power), dcx);
+        dzy <span style="color:#f92672">=</span> dqAdd(dqPow(dzy, power), dcy);
+        dzz <span style="color:#f92672">=</span> dqAdd(dqPow(dzz, power), dcz);
+        dzw <span style="color:#f92672">=</span> dqAdd(dqPow(dzw, power), dcw);
+        
+        <span style="color:#66d9ef">if</span> (qNorm(dzx.q) <span style="color:#f92672">&gt;</span> escapeCriteria) <span style="color:#66d9ef">break</span>;
     }
     
-    <span style="color:#66d9ef">return</span> z <span style="color:#f92672">*</span> J;
+    mat4 J <span style="color:#f92672">=</span> mat4(dzx.d, dzy.d, dzz.d, dzw.d);
+    <span style="color:#66d9ef">return</span> dzx.q <span style="color:#f92672">*</span> J;
 }
-
-vec4 <span style="color:#a6e22e">normalMandelbrot</span>(vec4 c, vec4 z)
+vec4 <span style="color:#a6e22e">normalMandelbrot</span>(vec4 c, vec4 z, <span style="color:#66d9ef">int</span> power, <span style="color:#66d9ef">int</span> numIterations, <span style="color:#66d9ef">float</span> escapeCriteria)
 {
-    <span style="color:#75715e">// jacobian
-</span><span style="color:#75715e"></span>    mat4 J <span style="color:#f92672">=</span> mat4(<span style="color:#ae81ff">0.0</span>);
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> mandelbrotIterations; <span style="color:#f92672">++</span>i)
+    DualQ dzx <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dzy <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dzz <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dzw <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    
+    DualQ dcx <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcy <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcz <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>));
+    DualQ dcw <span style="color:#f92672">=</span> DualQ(c, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>));
+    
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> numIterations; <span style="color:#f92672">++</span>i)
     {
-        <span style="color:#75715e">// forward-mode manual differentiation
-</span><span style="color:#75715e"></span>        <span style="color:#75715e">// NOTE: glsl uses column-major matrices
-</span><span style="color:#75715e"></span>        J <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> mat4(
-            <span style="color:#f92672">+</span>z.x, z.y, z.z, z.w,
-            <span style="color:#f92672">-</span>z.y, z.x, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>,
-            <span style="color:#f92672">-</span>z.z, <span style="color:#ae81ff">0.0</span>, z.x, <span style="color:#ae81ff">0.0</span>,
-            <span style="color:#f92672">-</span>z.w, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, z.x
-        ) <span style="color:#f92672">*</span> J <span style="color:#f92672">+</span> mat4(<span style="color:#ae81ff">1.0</span>);
-        z <span style="color:#f92672">=</span> qAdd(qPow(z, <span style="color:#ae81ff">2</span>), c);
-        <span style="color:#66d9ef">if</span> (length(z) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2.0</span>) <span style="color:#66d9ef">break</span>;
+        <span style="color:#75715e">// forward-mode automatic differentiation
+</span><span style="color:#75715e"></span>        dzx <span style="color:#f92672">=</span> dqAdd(dqPow(dzx, power), dcx);
+        dzy <span style="color:#f92672">=</span> dqAdd(dqPow(dzy, power), dcy);
+        dzz <span style="color:#f92672">=</span> dqAdd(dqPow(dzz, power), dcz);
+        dzw <span style="color:#f92672">=</span> dqAdd(dqPow(dzw, power), dcw);
+        
+        <span style="color:#66d9ef">if</span> (qNorm(dzx.q) <span style="color:#f92672">&gt;</span> escapeCriteria) <span style="color:#66d9ef">break</span>;
     }
     
-    <span style="color:#66d9ef">return</span> z <span style="color:#f92672">*</span> J;
+    mat4 J <span style="color:#f92672">=</span> mat4(dzx.d, dzy.d, dzz.d, dzw.d);
+    <span style="color:#66d9ef">return</span> dzx.q <span style="color:#f92672">*</span> J;
 }
 </code></pre></div><p>これで推定された法線を使ってシェーディングできる．今回はシンプルなPhong反射モデルを使ってシェーディングした．
 残りのソースは以下．</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">#version 150
 </span><span style="color:#75715e"></span>
-<span style="color:#75715e">// ---------------- variables ---------------- //
+<span style="color:#75715e">// ================ definitions ================ //
 </span><span style="color:#75715e"></span>
-uniform <span style="color:#66d9ef">float</span> uElapsedSeconds;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform vec2 uResolution;
-uniform vec3 uCameraPosition;
-uniform vec3 uLightDirection <span style="color:#f92672">=</span> vec3(<span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>);
-uniform vec4 uLightAmbientColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">0.0</span>), <span style="color:#ae81ff">1.0</span>);
-uniform vec4 uLightDiffuseColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">0.5</span>), <span style="color:#ae81ff">1.0</span>);
-uniform vec4 uLightSpecularColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">1.0</span>);
-uniform vec4 uMaterialAmbientColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">1.0</span>);
-uniform vec4 uMaterialDiffuseColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">1.0</span>);
-uniform vec4 uMaterialSpecularColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">1.0</span>);
-uniform vec4 uMaterialEmissionColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">0.0</span>), <span style="color:#ae81ff">1.0</span>);
-uniform <span style="color:#66d9ef">float</span> uShininess <span style="color:#f92672">=</span> <span style="color:#ae81ff">64.0</span>;
-uniform <span style="color:#66d9ef">int</span> juliaIterations <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-uniform <span style="color:#66d9ef">int</span> mandelbrotIterations <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-uniform <span style="color:#66d9ef">int</span> marchingIterations <span style="color:#f92672">=</span> <span style="color:#ae81ff">500</span>;
-uniform <span style="color:#66d9ef">float</span> convergenceCriteria <span style="color:#f92672">=</span> <span style="color:#ae81ff">1e-4</span>;
+<span style="color:#75715e">// ---------------- rendering components ---------------- //
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">App</span>
+{
+    <span style="color:#66d9ef">float</span> time;
+    vec2 resolution;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Camera</span>
+{
+    mat4 viewMatrix;
+    mat4 projectionMatrix;
+    vec3 position;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">PointLight</span>
+{
+    vec3 position;
+    vec4 ambientColor;
+    vec4 diffuseColor;
+    vec4 specularColor;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">DirectionalLight</span>
+{
+    vec3 direction;
+    vec4 ambientColor;
+    vec4 diffuseColor;
+    vec4 specularColor;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Material</span>
+{
+    vec4 ambientColor;
+    vec4 diffuseColor;
+    vec4 specularColor;
+    vec4 emissionColor;
+    <span style="color:#66d9ef">float</span> shininess;
+    <span style="color:#66d9ef">float</span> refractiveIndex;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">March</span>
+{
+    <span style="color:#66d9ef">int</span> numIterations;
+    <span style="color:#66d9ef">float</span> convergenceCriteria;
+    <span style="color:#66d9ef">float</span> finiteDifferenceEpsilon;
+};
+
+<span style="color:#75715e">// ---------------- primitives ---------------- //
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Line</span>
+{
+    vec3 position;
+    vec3 direction;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Sphere</span>
+{
+    <span style="color:#66d9ef">float</span> radius;
+    vec3 position;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Box</span>
+{
+    vec3 size;
+    vec3 position;
+    <span style="color:#75715e">// mat3 orientation;
+</span><span style="color:#75715e"></span>};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Intersection</span>
+{
+    vec3 position;
+    <span style="color:#66d9ef">bool</span> intersected;
+};
+
+<span style="color:#75715e">// ---------------- scene components ---------------- //
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">FractalParams</span>
+{
+    <span style="color:#66d9ef">int</span> power;
+    <span style="color:#66d9ef">int</span> numIterations;
+    <span style="color:#66d9ef">float</span> escapeCriteria;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Fractal</span>
+{
+    FractalParams params;
+    Material material;
+};
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Scene</span>
+{
+    vec4 backgroundColor;
+    
+    DirectionalLight light;
+    Sphere boundingSphere;
+    Fractal fractal;
+};
+
+<span style="color:#75715e">// ================ variables ================ //
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// ---------------- rendering components ---------------- //
+</span><span style="color:#75715e"></span>
+uniform App uApp;
+uniform Camera uCamera;
+uniform March uMarch <span style="color:#f92672">=</span> March(<span style="color:#ae81ff">300</span>, <span style="color:#ae81ff">1e-4</span>, <span style="color:#ae81ff">1e-4</span>);
+
+<span style="color:#75715e">// ---------------- scene components ---------------- //
+</span><span style="color:#75715e"></span>
+uniform Scene uScene <span style="color:#f92672">=</span> Scene(
+    vec4(vec3(<span style="color:#ae81ff">0.05</span>), <span style="color:#ae81ff">1.0</span>),
+    DirectionalLight(vec3(<span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.0</span>), vec4(vec3(<span style="color:#ae81ff">0.05</span>), <span style="color:#ae81ff">1.0</span>), vec4(vec3(<span style="color:#ae81ff">0.8</span>), <span style="color:#ae81ff">1.0</span>), vec4(vec3(<span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">1.0</span>)),
+    Sphere(<span style="color:#ae81ff">1.7</span>, vec3(<span style="color:#ae81ff">0.0</span>)),
+    Fractal(FractalParams(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">2.0</span>), Material(vec4(vec3(<span style="color:#ae81ff">0.1</span>), <span style="color:#ae81ff">1.0</span>), vec4(vec3(<span style="color:#ae81ff">0.8</span>), <span style="color:#ae81ff">1.0</span>), vec4(vec3(<span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">1.0</span>), vec4(vec3(<span style="color:#ae81ff">0.0</span>), <span style="color:#ae81ff">1.0</span>), <span style="color:#ae81ff">64.0</span>, <span style="color:#ae81ff">1.5</span>))
+);
+
+<span style="color:#75715e">// ---------------- varying ---------------- //
+</span><span style="color:#75715e"></span>
 out vec4 oFragColor;
 
+<span style="color:#75715e">// ================ functions ================ //
+</span><span style="color:#75715e"></span>
 <span style="color:#75715e">// ---------------- utilities ---------------- //
 </span><span style="color:#75715e"></span>
 vec2 <span style="color:#a6e22e">linmap</span>(vec2 in_val, vec2 in_min, vec2 in_max, vec2 out_min, vec2 out_max)
@@ -398,75 +526,117 @@ vec2 <span style="color:#a6e22e">linmap</span>(vec2 in_val, vec2 in_min, vec2 in
     <span style="color:#66d9ef">return</span> (in_val <span style="color:#f92672">-</span> in_min) <span style="color:#f92672">/</span> (in_max <span style="color:#f92672">-</span> in_min) <span style="color:#f92672">*</span> (out_max <span style="color:#f92672">-</span> out_min) <span style="color:#f92672">+</span> out_min;
 }
 
+<span style="color:#75715e">// ---------------- primitives ---------------- //
+</span><span style="color:#75715e"></span>
+Intersection <span style="color:#a6e22e">intersectionSphereLine</span>(Sphere sphere, Line line)
+{
+    vec3 difference <span style="color:#f92672">=</span> line.position <span style="color:#f92672">-</span> sphere.position;
+    <span style="color:#66d9ef">float</span> a <span style="color:#f92672">=</span> dot(line.direction, line.direction);
+    <span style="color:#66d9ef">float</span> b <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> dot(difference, line.direction);
+    <span style="color:#66d9ef">float</span> c <span style="color:#f92672">=</span> dot(difference, difference) <span style="color:#f92672">-</span> pow(sphere.radius, <span style="color:#ae81ff">2</span>);
+    <span style="color:#66d9ef">float</span> d <span style="color:#f92672">=</span> pow(b, <span style="color:#ae81ff">2</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">4</span> <span style="color:#f92672">*</span> a <span style="color:#f92672">*</span> c;
+    <span style="color:#66d9ef">float</span> t <span style="color:#f92672">=</span> (<span style="color:#f92672">-</span>b <span style="color:#f92672">-</span> sqrt(d)) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> a);
+    <span style="color:#66d9ef">return</span> Intersection(line.position <span style="color:#f92672">+</span> t <span style="color:#f92672">*</span> line.direction, d <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>);
+}
+
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfSphere</span>(Sphere sphere, vec3 position)
+{
+    <span style="color:#66d9ef">return</span> length(position <span style="color:#f92672">-</span> sphere.position) <span style="color:#f92672">-</span> sphere.radius;
+}
+
+vec3 <span style="color:#a6e22e">normalSphere</span>(Sphere sphere, vec3 position)
+{
+    <span style="color:#66d9ef">return</span> normalize(position <span style="color:#f92672">-</span> sphere.position);
+}
+
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfBox</span>(Box box, vec3 position)
+{
+    position <span style="color:#f92672">=</span> (position <span style="color:#f92672">-</span> box.position); <span style="color:#75715e">// * box.orientation;
+</span><span style="color:#75715e"></span>    vec3 difference <span style="color:#f92672">=</span> abs(position) <span style="color:#f92672">-</span> box.size;
+    <span style="color:#66d9ef">return</span> length(max(difference, <span style="color:#ae81ff">0.0</span>)) <span style="color:#f92672">+</span> min(max(difference.x, max(difference.y, difference.z)), <span style="color:#ae81ff">0.0</span>);
+}
+
+vec3 <span style="color:#a6e22e">normalBox</span>(Box box, vec3 position, <span style="color:#66d9ef">float</span> finiteDifferenceEpsilon)
+{
+    <span style="color:#66d9ef">return</span> normalize(vec3(
+        sdfBox(box, vec3(position.x <span style="color:#f92672">+</span> finiteDifferenceEpsilon, position.y, position.z)) <span style="color:#f92672">-</span> sdfBox(box, vec3(position.x <span style="color:#f92672">-</span> finiteDifferenceEpsilon, position.y, position.z)),
+        sdfBox(box, vec3(position.x, position.y <span style="color:#f92672">+</span> finiteDifferenceEpsilon, position.z)) <span style="color:#f92672">-</span> sdfBox(box, vec3(position.x, position.y <span style="color:#f92672">-</span> finiteDifferenceEpsilon, position.z)),
+        sdfBox(box, vec3(position.x, position.y, position.z <span style="color:#f92672">+</span> finiteDifferenceEpsilon)) <span style="color:#f92672">-</span> sdfBox(box, vec3(position.x, position.y, position.z <span style="color:#f92672">-</span> finiteDifferenceEpsilon))
+    ));
+}
+
 <span style="color:#75715e">// ---------------- reflection ---------------- //
 </span><span style="color:#75715e"></span>
-vec4 <span style="color:#a6e22e">phongReflection</span>(
-    vec3 surfaceNormal,
-    vec3 eyeDirection,
-    vec3 lightDirection,
-    vec4 lightAmbientColor,
-    vec4 lightDiffuseColor,
-    vec4 lightSpecularColor,
-    vec4 materialAmbientColor,
-    vec4 materialDiffuseColor,
-    vec4 materialSpecularColor,
-    vec4 materialEmissionColor,
-    <span style="color:#66d9ef">float</span> shineness
-)
+vec4 <span style="color:#a6e22e">phongReflection</span>(vec3 surfaceNormal, vec3 eyeDirection, DirectionalLight light, Material material)
 {
     surfaceNormal <span style="color:#f92672">=</span> normalize(surfaceNormal);
     eyeDirection <span style="color:#f92672">=</span> normalize(eyeDirection);
-    lightDirection <span style="color:#f92672">=</span> normalize(lightDirection);
-    vec4 ambientColor <span style="color:#f92672">=</span> lightAmbientColor <span style="color:#f92672">*</span> materialAmbientColor;
-    vec4 diffuseColor <span style="color:#f92672">=</span> lightDiffuseColor <span style="color:#f92672">*</span> materialDiffuseColor;
-    vec4 specularColor <span style="color:#f92672">=</span> lightSpecularColor <span style="color:#f92672">*</span> materialSpecularColor;
-    diffuseColor <span style="color:#f92672">*=</span> max(dot(<span style="color:#f92672">-</span>lightDirection, surfaceNormal), <span style="color:#ae81ff">0.0</span>);
-    specularColor <span style="color:#f92672">*=</span> pow(max(dot(reflect(lightDirection, surfaceNormal), <span style="color:#f92672">-</span>eyeDirection), <span style="color:#ae81ff">0.0</span>), shineness);
-    vec4 color <span style="color:#f92672">=</span> clamp(ambientColor <span style="color:#f92672">+</span> diffuseColor <span style="color:#f92672">+</span> specularColor <span style="color:#f92672">+</span> materialEmissionColor, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>);
+    light.direction <span style="color:#f92672">=</span> normalize(light.direction);
+    
+    vec4 ambientColor <span style="color:#f92672">=</span> light.ambientColor <span style="color:#f92672">*</span> material.ambientColor;
+    vec4 diffuseColor <span style="color:#f92672">=</span> light.diffuseColor <span style="color:#f92672">*</span> material.diffuseColor;
+    vec4 specularColor <span style="color:#f92672">=</span> light.specularColor <span style="color:#f92672">*</span> material.specularColor;
+    
+    diffuseColor <span style="color:#f92672">*=</span> max(dot(<span style="color:#f92672">-</span>light.direction, surfaceNormal), <span style="color:#ae81ff">0.0</span>);
+    specularColor <span style="color:#f92672">*=</span> pow(max(dot(reflect(light.direction, surfaceNormal), <span style="color:#f92672">-</span>eyeDirection), <span style="color:#ae81ff">0.0</span>), material.shininess);
+    
+    vec4 color <span style="color:#f92672">=</span> clamp(ambientColor <span style="color:#f92672">+</span> diffuseColor <span style="color:#f92672">+</span> specularColor <span style="color:#f92672">+</span> material.emissionColor, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>);
     <span style="color:#66d9ef">return</span> color;
 }
 
-<span style="color:#75715e">// ---------------- main ---------------- //
+<span style="color:#66d9ef">float</span> <span style="color:#a6e22e">fresnelReflectance</span>(vec3 light, vec3 normal, <span style="color:#66d9ef">float</span> refractiveIndex)
+{
+    <span style="color:#66d9ef">float</span> specularReflectance <span style="color:#f92672">=</span> pow((<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> refractiveIndex) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">+</span> refractiveIndex), <span style="color:#ae81ff">2.0</span>);
+    <span style="color:#66d9ef">return</span> specularReflectance <span style="color:#f92672">+</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> specularReflectance) <span style="color:#f92672">*</span> pow(<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> dot(<span style="color:#f92672">-</span>light, normal), <span style="color:#ae81ff">5.0</span>);
+}
+
+<span style="color:#75715e">// ---------------- ray marching ---------------- //
 </span><span style="color:#75715e"></span>
+vec4 <span style="color:#a6e22e">rayMarching</span>(App app, Scene scene, March march, Line ray)
+{
+    Intersection intersection <span style="color:#f92672">=</span> intersectionSphereLine(scene.boundingSphere, ray);
+    
+    <span style="color:#66d9ef">if</span> (intersection.intersected)
+    {
+        ray.position <span style="color:#f92672">=</span> intersection.position;
+        
+        vec4 juliaType <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.45</span> <span style="color:#f92672">*</span> cos(vec4(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">3.9</span>, <span style="color:#ae81ff">1.4</span>, <span style="color:#ae81ff">1.1</span>) <span style="color:#f92672">+</span> app.time <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.15</span> <span style="color:#f92672">*</span> vec4(<span style="color:#ae81ff">1.2</span>, <span style="color:#ae81ff">1.7</span>, <span style="color:#ae81ff">1.3</span>, <span style="color:#ae81ff">2.5</span>)) <span style="color:#f92672">-</span> vec4(<span style="color:#ae81ff">0.3</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>);
+        vec4 criticalPoint <span style="color:#f92672">=</span> vec4(<span style="color:#ae81ff">0.0</span>);
+        
+        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> march.numIterations; <span style="color:#f92672">++</span>i)
+        {
+            <span style="color:#66d9ef">float</span> sdf <span style="color:#f92672">=</span> sdfJulia(vec4(ray.position, <span style="color:#ae81ff">0.0</span>), juliaType, scene.fractal.params.power, scene.fractal.params.numIterations, scene.fractal.params.escapeCriteria);
+            
+            <span style="color:#75715e">// ray marching
+</span><span style="color:#75715e"></span>            ray.position <span style="color:#f92672">+=</span> sdf <span style="color:#f92672">*</span> ray.direction;
+            
+            <span style="color:#75715e">// collision detection
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> (abs(sdf) <span style="color:#f92672">&lt;</span> march.convergenceCriteria)
+            {
+                vec3 surfaceNormal <span style="color:#f92672">=</span> normalize(normalJulia(vec4(ray.position, <span style="color:#ae81ff">0.0</span>), juliaType, scene.fractal.params.power, scene.fractal.params.numIterations, scene.fractal.params.escapeCriteria).xyz);
+                
+                vec4 fragColor <span style="color:#f92672">=</span> phongReflection(surfaceNormal, ray.direction, scene.light, scene.fractal.material);
+                
+                <span style="color:#66d9ef">return</span> fragColor;
+            }
+            
+            <span style="color:#66d9ef">if</span> (sdfSphere(scene.boundingSphere, ray.position) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">break</span>;
+        }
+    }
+    
+    <span style="color:#66d9ef">return</span> scene.backgroundColor;
+}
+
 <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>()
 {
-    vec2 fragCoord <span style="color:#f92672">=</span> linmap(gl_FragCoord.xy, vec2(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), uResolution, vec2(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>), vec2(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>));
+    vec2 fragCoord <span style="color:#f92672">=</span> linmap(gl_FragCoord.xy, vec2(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), uApp.resolution, vec2(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>), vec2(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>));
     
     <span style="color:#75715e">// why this does not work?
 </span><span style="color:#75715e"></span>    <span style="color:#75715e">// vec3 rayDirection = normalize((inverse(uViewMatrix) * inverse(uProjectionMatrix) * vec4(vec3(fragCoord, 1.0), 0.0)).xyz);
-</span><span style="color:#75715e"></span>    
-    vec3 rayDirection <span style="color:#f92672">=</span> normalize((inverse(mat3(uViewMatrix)) <span style="color:#f92672">*</span> inverse(mat3(uProjectionMatrix)) <span style="color:#f92672">*</span> vec3(fragCoord, <span style="color:#ae81ff">1.0</span>)).xyz);
-    vec3 rayPosition <span style="color:#f92672">=</span> uCameraPosition;
+</span><span style="color:#75715e"></span>    vec3 rayDirection <span style="color:#f92672">=</span> normalize((inverse(mat3(uCamera.viewMatrix)) <span style="color:#f92672">*</span> inverse(mat3(uCamera.projectionMatrix)) <span style="color:#f92672">*</span> vec3(fragCoord, <span style="color:#ae81ff">1.0</span>)).xyz);
     
-    vec4 juliaType <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.45</span> <span style="color:#f92672">*</span> cos(vec4(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">3.9</span>, <span style="color:#ae81ff">1.4</span>, <span style="color:#ae81ff">1.1</span>) <span style="color:#f92672">+</span> uElapsedSeconds <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.15</span> <span style="color:#f92672">*</span> vec4(<span style="color:#ae81ff">1.2</span>, <span style="color:#ae81ff">1.7</span>, <span style="color:#ae81ff">1.3</span>, <span style="color:#ae81ff">2.5</span>)) <span style="color:#f92672">-</span> vec4(<span style="color:#ae81ff">0.3</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>);
-    vec4 criticalPoint <span style="color:#f92672">=</span> vec4(<span style="color:#ae81ff">0.0</span>);
-    
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> marchingIterations; <span style="color:#f92672">++</span>i)
-    {
-        <span style="color:#66d9ef">float</span> sdf <span style="color:#f92672">=</span> sdfJulia(vec4(rayPosition, <span style="color:#ae81ff">0.0</span>), juliaType);
-        <span style="color:#75715e">// float sdf = sdfMandelbrot(vec4(rayPosition, 0.0), criticalPoint);
-</span><span style="color:#75715e"></span>        rayPosition <span style="color:#f92672">+=</span> sdf <span style="color:#f92672">*</span> rayDirection;
-        <span style="color:#66d9ef">if</span> (abs(sdf) <span style="color:#f92672">&lt;</span> convergenceCriteria)
-        {
-            vec3 surfaceNormal <span style="color:#f92672">=</span> normalize(normalJulia(vec4(rayPosition, <span style="color:#ae81ff">0.0</span>), juliaType).xyz);
-            <span style="color:#75715e">// vec3 surfaceNormal = normalize(normalMandelbrot(vec4(rayPosition, 0.0), criticalPoint).xyz);
-</span><span style="color:#75715e"></span>            oFragColor <span style="color:#f92672">=</span> phongReflection(
-                surfaceNormal,
-                rayDirection,
-                uLightDirection,
-                uLightAmbientColor,
-                uLightDiffuseColor,
-                uLightSpecularColor,
-                uMaterialAmbientColor,
-                uMaterialDiffuseColor,
-                uMaterialSpecularColor,
-                uMaterialEmissionColor,
-                uShininess
-            );
-            <span style="color:#66d9ef">return</span>;
-        }
-    }
-    oFragColor <span style="color:#f92672">=</span> vec4(vec3(<span style="color:#ae81ff">0.0</span>), <span style="color:#ae81ff">1.0</span>);
+    Line ray <span style="color:#f92672">=</span> Line(uCamera.position, rayDirection);
+    oFragColor <span style="color:#f92672">=</span> rayMarching(uApp, uScene, uMarch, ray);
 }
 </code></pre></div><p>実際にGLSLでレンダリングしてみた結果が以下．
 ここまで来るのは正直結構大変だったが，鏡面反射してくれてるのを見ると，法線が推定できている感じがして嬉しい
