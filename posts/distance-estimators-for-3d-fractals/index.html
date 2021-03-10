@@ -309,6 +309,7 @@ ${f_{c}^{n}}(z)$，${f_{c}^{n}}'(z)$がわかれば，距離推定により，�
     
     <span style="color:#66d9ef">return</span> (qNorm(dzx.q) <span style="color:#f92672">*</span> log(qNorm(dzx.q))) <span style="color:#f92672">/</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> qNorm(dzx.d));
 }
+
 <span style="color:#66d9ef">float</span> <span style="color:#a6e22e">sdfMandelbrot</span>(vec4 c, vec4 z, <span style="color:#66d9ef">int</span> power, <span style="color:#66d9ef">int</span> numIterations, <span style="color:#66d9ef">float</span> escapeCriteria)
 {
     DualQ dzx <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
@@ -365,6 +366,7 @@ vec4 <span style="color:#a6e22e">normalJulia</span>(vec4 z, vec4 c, <span style=
     mat4 J <span style="color:#f92672">=</span> mat4(dzx.d, dzy.d, dzz.d, dzw.d);
     <span style="color:#66d9ef">return</span> dzx.q <span style="color:#f92672">*</span> J;
 }
+
 vec4 <span style="color:#a6e22e">normalMandelbrot</span>(vec4 c, vec4 z, <span style="color:#66d9ef">int</span> power, <span style="color:#66d9ef">int</span> numIterations, <span style="color:#66d9ef">float</span> escapeCriteria)
 {
     DualQ dzx <span style="color:#f92672">=</span> DualQ(z, vec4(<span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>));
