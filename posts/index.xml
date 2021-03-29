@@ -6,7 +6,18 @@
     <description>Recent content in Posts on Hiroki Sakuma</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 09 Mar 2021 00:55:46 +0900</lastBuildDate><atom:link href="https://hirokisakuma.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 29 Mar 2021 11:16:02 +0900</lastBuildDate><atom:link href="https://hirokisakuma.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Accepted to ICRA 2021</title>
+      <link>https://hirokisakuma.com/posts/accepted-to-icra-2021/</link>
+      <pubDate>Mon, 29 Mar 2021 11:16:02 +0900</pubDate>
+      
+      <guid>https://hirokisakuma.com/posts/accepted-to-icra-2021/</guid>
+      <description>The following paper has been accepted to ICRA 2021.
+Geometry-Aware Unsupervised Domain Adaptation for Stereo Matching 
+ </description>
+    </item>
+    
     <item>
       <title>Unknown Pleasures</title>
       <link>https://hirokisakuma.com/posts/unknown-pleasures/</link>
