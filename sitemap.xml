@@ -1,118 +1,72 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://hirokisakuma.com/posts/accepted-to-icra-2021/</loc>
     <lastmod>2021-03-29T11:16:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/</loc>
     <lastmod>2021-03-29T11:16:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/posts/</loc>
     <lastmod>2021-03-29T11:16:02+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/posts/unknown-pleasures/</loc>
     <lastmod>2021-03-09T00:55:46+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/computer-graphics/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/posts/distance-estimators-for-3d-fractals/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/fractals/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/glsl/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/sphere-tracing/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/</loc>
     <lastmod>2020-10-25T20:25:53+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/differentiable-renderirng/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/posts/differentiable-sphere-tracing/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/neural-network/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/pytorch/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/pytorch3d/</loc>
     <lastmod>2020-10-09T03:00:28+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/cinder/</loc>
     <lastmod>2020-10-05T03:29:07+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/posts/environment-mapping/</loc>
     <lastmod>2020-10-05T03:29:07+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/c&#43;&#43;/</loc>
     <lastmod>2020-08-11T23:24:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/posts/max/msp%E3%81%A7python%E3%82%92%E4%BD%BF%E3%81%86/</loc>
     <lastmod>2020-08-11T23:24:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/python/</loc>
     <lastmod>2020-08-11T23:24:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/about/</loc>
     <lastmod>2020-08-11T22:53:00+09:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/categories/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://hirokisakuma.com/tags/max/msp/</loc>
   </url>
-  
 </urlset>
